@@ -26,10 +26,10 @@ namespace CrazyBandit.Engine
         }
 
         /// <inheritdoc />
-        public float Calculate(float bet, Symbol symbol)
+        public float Calculate(int bet, Symbol symbol)
         {
-            float factor = m_winnings[symbol];
-            return bet * factor;            
+            float winningValue = m_winnings[symbol];
+            return bet * winningValue;            
         }
     }
 }
