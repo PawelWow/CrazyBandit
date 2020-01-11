@@ -1,4 +1,4 @@
-﻿using System;
+﻿using CrazyBandit.Common;
 
 namespace CrazyBandit.Engine
 {
@@ -24,6 +24,8 @@ namespace CrazyBandit.Engine
         /// <param name="spin"><inheritdoc cref="Spin"/></param>
         public Reel(Symbol[] symbols, int spin)
         {
+            Ensure.ParamNotNull(symbols, nameof(symbols));
+
             this.Symbols = symbols;
             this.Spin = spin;
         }
