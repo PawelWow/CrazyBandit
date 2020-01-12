@@ -12,6 +12,6 @@ namespace CrazyBandit.Engine
         /// <summary>
         /// Linie ułożone na bębnach
         /// </summary>
-        IEnumerable<Symbol[]> Lines { get; }
+        IEnumerable<int[]> Lines { get; }
     }
 }

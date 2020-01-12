@@ -1,4 +1,4 @@
-﻿namespace CrazyBandit.Engine
+﻿namespace CrazyBandit.Console
 {
     /// <summary>
     /// Symbole na walcach

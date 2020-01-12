@@ -10,7 +10,7 @@ namespace CrazyBandit.Engine
         /// <summary>
         /// Symbole tegoż walca
         /// </summary>
-        public Symbol[] Symbols { get; }
+        public int[] Symbols { get; }
 
         /// <summary>
         /// Ile symboli przelatuje przy pojedynczym zakręceniu tym walcem?
@@ -22,7 +22,7 @@ namespace CrazyBandit.Engine
         /// </summary>
         /// <param name="symbols"><inheritdoc cref="Symbols"/></param>
         /// <param name="spin"><inheritdoc cref="Spin"/></param>
-        public Reel(Symbol[] symbols, int spin)
+        public Reel(int[] symbols, int spin)
         {
             Ensure.ParamNotNull(symbols, nameof(symbols));
 

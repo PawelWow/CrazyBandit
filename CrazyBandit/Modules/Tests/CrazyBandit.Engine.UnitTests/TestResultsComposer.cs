@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace CrazyBandit.Engine.UnitTests
@@ -11,25 +12,6 @@ namespace CrazyBandit.Engine.UnitTests
     [TestClass]
     public class TestResultsComposer
     {
-        [TestMethod]
-        public void ResultsComposer_SimpleArray()
-        {
-            Reel[] reels = new Reel[]
-            {
-                new Reel(new Symbol[]{ Symbol.B, Symbol.Dollar, Symbol.Cherry}, 1),
-                new Reel(new Symbol[]{ Symbol.Joker, Symbol.Dollar}, 1),
-                new Reel(new Symbol[]{ Symbol.MoneyBag, Symbol.Paragraph, Symbol.Dollar}, 1),
-                new Reel(new Symbol[]{ Symbol.Seven, Symbol.MoneyBag, Symbol.Dollar, Symbol.Joker}, 1),
-
-            };
-
-            ResultsComposer composer = new ResultsComposer(reels);
-
-            // Mnożymy wszystkie kombinacje walców
-            Assert.AreEqual(72, composer.Lines.Count());
-            this.AssertLinesUnique(composer.Lines);
-        }
-
         /// <summary>
         /// Test sprawdza czy kombinacje dobrze są liczone dla walców o różnej długości, jeśli pierwszy walce ma najwięcej elementów
         /// </summary>
@@ -38,9 +20,9 @@ namespace CrazyBandit.Engine.UnitTests
         {
             Reel[] reels = new Reel[]
             {
-                new Reel(new Symbol[]{ Symbol.B, Symbol.Dollar, Symbol.Cherry}, 1),
-                new Reel(new Symbol[]{ Symbol.Joker, Symbol.Dollar}, 1),
-                new Reel(new Symbol[]{ Symbol.MoneyBag }, 1),               
+                new Reel(new int[]{ 0, 1, 3}, 1),
+                new Reel(new int[]{ 6, 1}, 1),
+                new Reel(new int[]{ 5 }, 1),               
             };
 
             ResultsComposer composer = new ResultsComposer(reels);
@@ -58,9 +40,9 @@ namespace CrazyBandit.Engine.UnitTests
         {
             Reel[] reels = new Reel[]
             {
-                new Reel(new Symbol[]{ Symbol.MoneyBag }, 1),
-                new Reel(new Symbol[]{ Symbol.Joker, Symbol.Dollar}, 1),
-                new Reel(new Symbol[]{ Symbol.B, Symbol.Dollar, Symbol.Cherry}, 1),            
+                new Reel(new int[]{ 5 }, 1),
+                new Reel(new int[]{ 6, 1}, 1),
+                new Reel(new int[]{ 0, 1, 3}, 1),
             };
 
             ResultsComposer composer = new ResultsComposer(reels);
@@ -76,15 +58,15 @@ namespace CrazyBandit.Engine.UnitTests
         [TestMethod]
         public void ResultsComposer_Reels_Default()
         {
-            int[] reel1Values = new int[] { 0, 1, 2, 3, 4, 4, 4, 5, 6, 7, 7, 0, 0, 2, 2, 3 };
-            int[] reel2Values = new int[] { 7, 7, 7, 6, 6, 6, 5, 5, 5, 4, 3, 2, 2, 2, 1, 1, 1, 0, 0, 0, 2, 3, 4, 7 };
-            int[] reel3Values = new int[] { 0, 1, 0, 2, 0, 3, 4, 5, 6, 6, 6, 6, 6, 5, 5, 5, 1, 0, 1, 2, 3, 4, 1, 1, 1, 0, 0, 7, 7, 7, 5 };
+            int[] reel1Symbols = new int[] { 0, 1, 2, 3, 4, 4, 4, 5, 6, 7, 7, 0, 0, 2, 2, 3 };
+            int[] reel2Symbols = new int[] { 7, 7, 7, 6, 6, 6, 5, 5, 5, 4, 3, 2, 2, 2, 1, 1, 1, 0, 0, 0, 2, 3, 4, 7 };
+            int[] reel3Symbols = new int[] { 0, 1, 0, 2, 0, 3, 4, 5, 6, 6, 6, 6, 6, 5, 5, 5, 1, 0, 1, 2, 3, 4, 1, 1, 1, 0, 0, 7, 7, 7, 5 };
 
             Reel[] reels = new Reel[]
             {            
-                new Reel(this.ConvertToSymbols(reel1Values), 1),
-                new Reel(this.ConvertToSymbols(reel2Values), 1),
-                new Reel(this.ConvertToSymbols(reel3Values), 1),
+                new Reel(reel1Symbols, 1),
+                new Reel(reel2Symbols, 1),
+                new Reel(reel3Symbols, 1),
             };
 
             ResultsComposer composer = new ResultsComposer(reels);
@@ -93,22 +75,54 @@ namespace CrazyBandit.Engine.UnitTests
         }
 
         /// <summary>
-        /// Zamienia tablicę intów na odpowiadającą jej tablicę symboli
+        /// Sprawdza czy w wynikach udaje się ułożyć linie o takich samych wartościach
         /// </summary>
-        /// <param name="numbers">numery symboli</param>
-        /// <returns>Tablica symboli</returns>
-        private Symbol[] ConvertToSymbols(int[] numbers)
+        [TestMethod]
+        public void ResultsComposer_Do_Winning_Lines_Exist()
         {
-            return Array.ConvertAll(numbers, i => (Symbol)i);
+            Reel[] reels = new Reel[]
+            {
+                new Reel(new int[]{ 0, 1, 5}, 1),
+                new Reel(new int[]{ 5, 1}, 1),
+                new Reel(new int[]{ 5, 2, 1}, 1),
+                new Reel(new int[]{ 7, 5, 1, 6}, 1),
+
+            };
+
+            ResultsComposer composer = new ResultsComposer(reels);
+            Assert.AreEqual(2, composer.Lines.Count(this.IsWinningLine), "No expected winning line.");
+        }
+
+        /// <summary>
+        /// Czy to jest linia wygrywająca, czyli taka, która ma wszystkie elementy (symbole) takie same?
+        /// </summary>
+        /// <param name="line">Linia, którą sprawdzamy</param>
+        /// <returns>True, jeśli jest to linia zwycięska.</returns>
+        private bool IsWinningLine(int[] line)
+        {
+            for (int i = 0; i < line.Length; i++)
+            {
+                if (i == 0)
+                {
+                    continue;
+                }
+
+                if (line[i] != line[i - 1])
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         /// <summary>
         /// Helper sprawdzający czy linie są unikalne. Mają być unikalne, jeśli każdy walec będzie miał unikalną listę symboli.
         /// </summary>
         /// <param name="linesVerified">Zestaw linii do weryfikacji</param>
-        private void AssertLinesUnique(IEnumerable<Symbol[]> linesVerified)
+        private void AssertLinesUnique(IEnumerable<int[]> linesVerified)
         {
-            foreach (Symbol[] line in linesVerified)
+            foreach (int[] line in linesVerified)
             {
                 int linesEqual = linesVerified.Count(l => Enumerable.SequenceEqual(line, l));
                 string lineValues = string.Join(", ", line);

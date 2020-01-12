@@ -25,27 +25,27 @@ namespace CrazyBandit.Engine.UnitTests
         [TestMethod]
         public void WinningsCalculator_Calculate()
         {
-            Dictionary<Symbol, float> winnings = new Dictionary<Symbol, float>
+            Dictionary<int, float> winnings = new Dictionary<int, float>
             {
-                { Symbol.B, 1 },
-                { Symbol.Cherry, 12 },
-                { Symbol.Dollar, 3 },
-                { Symbol.Horseshoe, 0.8f },
-                { Symbol.Joker, 0.4f },
-                { Symbol.MoneyBag, 10 },
-                { Symbol.Paragraph, 99 },
-                { Symbol.Seven, 1 }
+                { 0, 1 },
+                { 1, 12 },
+                { 2, 3 },
+                { 3, 0.8f },
+                { 4, 0.4f },
+                { 5, 10 },
+                { 6, 99 },
+                { 7, 1 }
             };
 
-            IEnumerable<Symbol> symbolsAll = Enum.GetValues(typeof(Symbol)).Cast<Symbol>();
+            IEnumerable<int> symbolsAll = winnings.Keys;
 
             WinningsCalculator calculator = new WinningsCalculator(winnings);            
 
             // Weryfikacja dla stawki = 1
             int bet = 1;            
-            Dictionary<Symbol, float> actualResults = this.CalculateWinnings(bet, calculator, symbolsAll);                      
+            Dictionary<int, float> actualResults = this.CalculateWinnings(bet, calculator, symbolsAll);                      
             
-            foreach(Symbol symbol in symbolsAll)
+            foreach(int symbol in symbolsAll)
             {
                 float expectedResult = winnings[symbol];
                 Assert.AreEqual(expectedResult, actualResults[symbol], $"Invalid result for {symbol}.");
@@ -55,7 +55,7 @@ namespace CrazyBandit.Engine.UnitTests
             bet = 9;            
             actualResults = this.CalculateWinnings(bet, calculator, symbolsAll);
 
-            foreach (Symbol symbol in symbolsAll)
+            foreach (int symbol in symbolsAll)
             {
                 float expectedResult = winnings[symbol] * bet;
                 Assert.AreEqual(expectedResult, actualResults[symbol], $"Invalid result for {symbol}.");
@@ -69,12 +69,12 @@ namespace CrazyBandit.Engine.UnitTests
         /// <param name="calculator">Kalkulator licz¹cy wynik</param>
         /// <param name="symbolsAll">Symbole, dla których budujemy wyniki.</param>
         /// <returns>S³ownik z wynikami.</returns>
-        private Dictionary<Symbol, float> CalculateWinnings(int bet, WinningsCalculator calculator, IEnumerable<Symbol> symbolsAll)
+        private Dictionary<int, float> CalculateWinnings(int bet, WinningsCalculator calculator, IEnumerable<int> symbolsAll)
         {            
-            Dictionary<Symbol, float> actualResults = new Dictionary<Symbol, float>();
-            foreach (var item in symbolsAll)
+            Dictionary<int, float> actualResults = new Dictionary<int, float>();
+            foreach (int symbol in symbolsAll)
             {
-                actualResults.Add(item, calculator.Calculate(bet, item));
+                actualResults.Add(symbol, calculator.Calculate(bet, symbol));
             }
 
             return actualResults;

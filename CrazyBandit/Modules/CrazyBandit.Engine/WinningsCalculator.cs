@@ -13,20 +13,20 @@ namespace CrazyBandit.Engine
         /// <summary>
         /// Wygrana za linie wygrywającą o danym symbolu
         /// </summary>
-        private readonly Dictionary<Symbol, float> m_winnings;
+        private readonly Dictionary<int, float> m_winnings;
 
         /// <summary>
         /// Konfiguruje mnożnik wygranych za linie danego symbolu.
         /// </summary>
         /// <param name="winnings"></param>
-        public WinningsCalculator(Dictionary<Symbol, float> winnings)
+        public WinningsCalculator(Dictionary<int, float> winnings)
         {
             Ensure.ParamNotNull(winnings, nameof(winnings));
             m_winnings = winnings;
         }
 
         /// <inheritdoc />
-        public float Calculate(int bet, Symbol symbol)
+        public float Calculate(int bet, int symbol)
         {
             float winningValue = m_winnings[symbol];
             return bet * winningValue;            

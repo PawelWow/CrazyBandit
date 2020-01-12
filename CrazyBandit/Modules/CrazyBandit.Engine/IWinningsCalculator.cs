@@ -11,6 +11,6 @@
         /// <param name="bet">Stawka jaką chcemy przemnożyć</param>
         /// <param name="symbol">Symbol</param>
         /// <returns>Ile wygrał za dany symbol</returns>
-        float Calculate(int bet, Symbol symbol);
+        float Calculate(int bet, int symbol);
     }
 }

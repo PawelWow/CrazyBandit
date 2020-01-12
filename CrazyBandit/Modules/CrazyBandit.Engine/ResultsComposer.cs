@@ -12,7 +12,7 @@ namespace CrazyBandit.Engine
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        public IEnumerable<Symbol[]> Lines { get; private set; }
+        public IEnumerable<int[]> Lines { get; private set; }
 
         /// <summary>
         /// C-tor ustawiający wszystkie możliwe linie
@@ -38,9 +38,9 @@ namespace CrazyBandit.Engine
         /// <param name="reels"></param>
         /// <returns></returns>
         /// <remarks>Źródło: https://www.geeksforgeeks.org/combinations-from-n-arrays-picking-one-element-from-each-array/ </remarks>
-        private IEnumerable<Symbol[]> ComposeLines(Reel[] reels)
+        private IEnumerable<int[]> ComposeLines(Reel[] reels)
         {
-            List<Symbol[]> lines = new List<Symbol[]>();
+            List<int[]> lines = new List<int[]>();
 
             // Kombinacje robimy dla tylu elementów, ile jest walców
             int reelsNumber = reels.Length;      
@@ -58,7 +58,7 @@ namespace CrazyBandit.Engine
             {
 
                 // Tworzymy nową linie i dodajemy do wyników
-                List<Symbol> currentLine = new List<Symbol>();
+                List<int> currentLine = new List<int>();
                 for (int i = 0; i < reelsNumber; i++)
                 {
                     currentLine.Add(reels[i].Symbols[pointers[i]]);
