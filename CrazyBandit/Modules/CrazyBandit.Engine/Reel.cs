@@ -1,4 +1,5 @@
 ﻿using CrazyBandit.Common;
+using System;
 
 namespace CrazyBandit.Engine
 {
@@ -25,6 +26,11 @@ namespace CrazyBandit.Engine
         public Reel(int[] symbols, int spin)
         {
             Ensure.ParamNotNull(symbols, nameof(symbols));
+
+            if (symbols.Length < spin)
+            {
+                throw new ArgumentException("Not enough symbols for that large spin.");
+            }
 
             this.Symbols = symbols;
             this.Spin = spin;
