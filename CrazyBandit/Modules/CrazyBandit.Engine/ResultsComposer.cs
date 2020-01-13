@@ -12,7 +12,7 @@ namespace CrazyBandit.Engine
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        public IEnumerable<int[]> Lines { get; private set; }
+        public int[][] Lines { get; private set; }
 
         /// <summary>
         /// C-tor ustawiający wszystkie możliwe linie
@@ -27,10 +27,10 @@ namespace CrazyBandit.Engine
                 {
                     throw new ArgumentException("Something is wrong with defined reel(s)");
                 }
-            }            
+            }
 
             this.Lines = this.ComposeLines(reels);
-        }
+        }        
 
         /// <summary>
         /// Chodzi po bębnach i komponuje wszystkie kombinacje, jakie mogą ustawić się w linii
@@ -38,17 +38,17 @@ namespace CrazyBandit.Engine
         /// <param name="reels"></param>
         /// <returns></returns>
         /// <remarks>Źródło: https://www.geeksforgeeks.org/combinations-from-n-arrays-picking-one-element-from-each-array/ </remarks>
-        private IEnumerable<int[]> ComposeLines(Reel[] reels)
+        private int[][] ComposeLines(Reel[] reels)
         {
+            // lista, ale może być tablic int[i][] 
+            // rozmiar "i" to liczba symboli walca1 x liczba symboli walca2 ... x liczba symboli walca "n"  
             List<int[]> lines = new List<int[]>();
 
             // Kombinacje robimy dla tylu elementów, ile jest walców
             int reelsNumber = reels.Length;      
             
-            // Wskaźniki dla kolejnych symboli na każdym z walców (
+            // Wskaźniki dla kolejnych symboli na każdym z walców 
             int[] pointers = new int[reelsNumber];
-
-
             for (int i = 0; i < reelsNumber; i++)
             {
                 pointers[i] = 0;
@@ -56,7 +56,6 @@ namespace CrazyBandit.Engine
 
             while(true)
             {
-
                 // Tworzymy nową linie i dodajemy do wyników
                 List<int> currentLine = new List<int>();
                 for (int i = 0; i < reelsNumber; i++)
@@ -76,7 +75,7 @@ namespace CrazyBandit.Engine
                 if (next < 0)
                 {
                     // wyjdź z while(true), bo nie ma więcej walców
-                    return lines;
+                    return lines.ToArray();
                 }
 
                 pointers[next]++;

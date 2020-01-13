@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace CrazyBandit.Engine
+﻿namespace CrazyBandit.Engine
 {
     /// <summary>
     /// Interfejs kompozytora wyników
@@ -12,6 +8,6 @@ namespace CrazyBandit.Engine
         /// <summary>
         /// Linie ułożone na bębnach
         /// </summary>
-        IEnumerable<int[]> Lines { get; }
+        int[][] Lines { get; }
     }
 }

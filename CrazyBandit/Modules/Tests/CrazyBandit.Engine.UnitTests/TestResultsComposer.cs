@@ -70,10 +70,11 @@ namespace CrazyBandit.Engine.UnitTests
             };
 
             ResultsComposer composer = new ResultsComposer(reels);
+                       
             // 16 x 24 x 31
             Assert.AreEqual(11904, composer.Lines.Count());
         }
-
+        
         /// <summary>
         /// Sprawdza czy w wynikach udaje się ułożyć linie o takich samych wartościach
         /// </summary>
@@ -91,6 +92,39 @@ namespace CrazyBandit.Engine.UnitTests
 
             ResultsComposer composer = new ResultsComposer(reels);
             Assert.AreEqual(2, composer.Lines.Count(this.IsWinningLine), "No expected winning line.");
+        }
+
+        /// <summary>
+        /// Sprawdza czy walce prawidłowo transformowane są do linii 
+        /// czyli miałem: 1,2,3
+        /// to teraz mam:
+        /// 1
+        /// 2
+        /// 3
+        /// </summary>
+        [TestMethod]
+        public void ResultsComposer_IsAppriopriate_Order()
+        {
+            int[] first = new int[] { 1, 2, 3, 4 };
+            int[] second = new int[] { 4, 6, 5, 7 };
+            int[] third = new int[] { 8, 9, 10, 11 };
+
+            Reel[] reels = new Reel[]
+            {
+                new Reel(first, 1),
+                new Reel(second, 1),
+                new Reel(third, 1),
+            };
+
+            ResultsComposer composer = new ResultsComposer(reels);
+
+            for (int i = 0; i < composer.Lines.Length; i++)
+            {
+                Assert.AreEqual(reels.Length, composer.Lines[i].Length, $"Invalid row {i} size.");
+                Assert.IsTrue(first.Any(symbol => symbol == composer.Lines[i][0]), $"Invalid value of 1st reel: '{composer.Lines[i][0]}', row: {i}");
+                Assert.IsTrue(second.Any(symbol => symbol == composer.Lines[i][1]), $"Invalid value of 2st reel: '{composer.Lines[i][1]}', row: {i}");
+                Assert.IsTrue(third.Any(symbol => symbol == composer.Lines[i][2]), $"Invalid value of 3rd reel: '{composer.Lines[i][2]}', row: {i}");               
+            }
         }
 
         /// <summary>
@@ -117,13 +151,14 @@ namespace CrazyBandit.Engine.UnitTests
         }
 
         /// <summary>
-        /// Helper sprawdzający czy linie są unikalne. Mają być unikalne, jeśli każdy walec będzie miał unikalną listę symboli.
+        /// Helper sprawdzający czy linie są unikalne. Tylko dla testów, w których spodziewamy się unikalnośći każdego z wyników
+        /// (!) Mają być unikalne, jeśli każdy walec będzie miał unikalną listę symboli.
         /// </summary>
         /// <param name="linesVerified">Zestaw linii do weryfikacji</param>
         private void AssertLinesUnique(IEnumerable<int[]> linesVerified)
         {
             foreach (int[] line in linesVerified)
-            {
+            {            
                 int linesEqual = linesVerified.Count(l => Enumerable.SequenceEqual(line, l));
                 string lineValues = string.Join(", ", line);
                 Assert.AreEqual(1, linesEqual, $"The line is not unique in collection: '{lineValues}'");
