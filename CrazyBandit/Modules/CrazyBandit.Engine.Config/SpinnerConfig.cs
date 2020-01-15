@@ -1,7 +1,7 @@
 ﻿using CrazyBandit.Common;
 using System;
 
-namespace CrazyBandit.Engine
+namespace CrazyBandit.Engine.Config
 {
     /// <summary>
     /// Konfig dla <see cref="Spinner"/>, który ma zagwarantować poprawne jego działanie.
@@ -39,7 +39,9 @@ namespace CrazyBandit.Engine
             Ensure.ParamNotNullOrEmpty(reels, nameof(reels));
             Ensure.ParamNotNull(rnoConfig, nameof(rnoConfig));
 
-            this.Spin = this.GetSpins(reels);            
+            this.Spin = this.GetSpins(reels);   
+            
+            // TODO jeszcze premyśleć. Ten composer powinien być w engine, a nie w configach
             ResultsComposer results = new ResultsComposer(reels);            
 
             this.ValidateConfig(results.Lines, rnoConfig, payLines);

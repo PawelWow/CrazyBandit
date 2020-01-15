@@ -1,13 +1,14 @@
 ﻿using CrazyBandit.Common;
+using CrazyBandit.Engine.Config;
 using System;
 using System.Collections.Generic;
 
-namespace CrazyBandit.Engine
+namespace CrazyBandit.Engine.Config
 {
     /// <summary>
     /// Kompozytor wyników - wszystkich możliwych linii dla zapodanych bębnów
     /// </summary>
-    internal class ResultsComposer : IResultsComposer
+    internal class ResultsComposer
     {       
         /// <summary>
         /// <inheritdoc/>

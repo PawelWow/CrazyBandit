@@ -7,13 +7,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{1EC45779
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrazyBandit.Console.UnitTests", "Modules\Tests\CrazyBandit.Console.UnitTests\CrazyBandit.Console.UnitTests.csproj", "{D2AFDEA8-1F1A-475F-94A9-54EF19C34E25}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrazyBandit.Console", "Modules\CrazyBandit.Console\CrazyBandit.Console.csproj", "{3CA87B15-F959-4391-A7A1-87E255785071}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrazyBandit.Console", "Modules\CrazyBandit.Console\CrazyBandit.Console.csproj", "{3CA87B15-F959-4391-A7A1-87E255785071}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrazyBandit.Engine", "Modules\CrazyBandit.Engine\CrazyBandit.Engine.csproj", "{EF57F461-0B31-4E7B-87EC-D749598DABCF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrazyBandit.Engine", "Modules\CrazyBandit.Engine\CrazyBandit.Engine.csproj", "{EF57F461-0B31-4E7B-87EC-D749598DABCF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrazyBandit.Engine.UnitTests", "Modules\Tests\CrazyBandit.Engine.UnitTests\CrazyBandit.Engine.UnitTests.csproj", "{41FE1785-3342-43AD-B1E3-A2622E1EA4DC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrazyBandit.Engine.UnitTests", "Modules\Tests\CrazyBandit.Engine.UnitTests\CrazyBandit.Engine.UnitTests.csproj", "{41FE1785-3342-43AD-B1E3-A2622E1EA4DC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrazyBandit.Common", "Modules\CrazyBandit.Common\CrazyBandit.Common.csproj", "{6A371CDC-7D47-4612-8EA8-D398D5E415A9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrazyBandit.Common", "Modules\CrazyBandit.Common\CrazyBandit.Common.csproj", "{6A371CDC-7D47-4612-8EA8-D398D5E415A9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrazyBandit.Engine.Config", "Modules\CrazyBandit.Engine.Config\CrazyBandit.Engine.Config.csproj", "{9E9C54F1-CD62-4158-9944-9DA8AA48C6DF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,6 +43,10 @@ Global
 		{6A371CDC-7D47-4612-8EA8-D398D5E415A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6A371CDC-7D47-4612-8EA8-D398D5E415A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6A371CDC-7D47-4612-8EA8-D398D5E415A9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9E9C54F1-CD62-4158-9944-9DA8AA48C6DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9E9C54F1-CD62-4158-9944-9DA8AA48C6DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9E9C54F1-CD62-4158-9944-9DA8AA48C6DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9E9C54F1-CD62-4158-9944-9DA8AA48C6DF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,14 +1,14 @@
-﻿namespace CrazyBandit.Engine
+﻿namespace CrazyBandit.Engine.Config
 {
     /// <summary>
     /// Globalne definicje dla projektu
     /// </summary>
-    internal class Defs
+    public class Defs
     {
         /// <summary>
         /// Liczba linii wygrywających. Jest to jednocześnie minimum kombinacji obsługiwanych przez program.
         /// </summary>
-        public const int PayLines = 5;
+        internal const int PayLines = 5;
 
         /// <summary>
         /// Maksymalna wartość defaultowego Rno. Potrzebna do wyliczenia zakresu

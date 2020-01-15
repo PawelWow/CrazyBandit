@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace CrazyBandit.Engine
+namespace CrazyBandit.Engine.Config
 {
     /// <summary>
     /// Konfig dla wartości RNO. Możemy go zdefiniować lub ustawić wartość defaultową.

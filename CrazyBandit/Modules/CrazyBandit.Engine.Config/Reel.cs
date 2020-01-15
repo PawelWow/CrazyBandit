@@ -1,7 +1,7 @@
 ﻿using CrazyBandit.Common;
 using System;
 
-namespace CrazyBandit.Engine
+namespace CrazyBandit.Engine.Config
 {
     /// <summary>
     /// Klasa walca

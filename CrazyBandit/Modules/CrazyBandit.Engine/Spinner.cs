@@ -1,4 +1,5 @@
 ﻿using CrazyBandit.Common;
+using CrazyBandit.Engine.Config;
 using System.Collections.Generic;
 
 namespace CrazyBandit.Engine

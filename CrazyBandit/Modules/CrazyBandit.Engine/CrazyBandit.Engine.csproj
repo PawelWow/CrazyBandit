@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CrazyBandit.Common\CrazyBandit.Common.csproj" />
+    <ProjectReference Include="..\CrazyBandit.Engine.Config\CrazyBandit.Engine.Config.csproj" />
   </ItemGroup>
 
 </Project>
