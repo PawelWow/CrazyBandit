@@ -6,4 +6,9 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\CrazyBandit.Engine.Config\CrazyBandit.Engine.Config.csproj" />
+    <ProjectReference Include="..\CrazyBandit.Engine\CrazyBandit.Engine.csproj" />
+  </ItemGroup>
+
 </Project>

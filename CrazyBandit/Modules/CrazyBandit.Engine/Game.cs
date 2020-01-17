@@ -48,18 +48,28 @@ namespace CrazyBandit.Engine
         }
 
         /// <summary>
+        /// Kolekcja walców
+        /// </summary>
+        public Reel[] Reels
+        {
+            get; private set;
+        }
+
+        /// <summary>
         /// Konstruktor gry
         /// </summary>
         /// <param name="spinner"></param>
         /// <param name="winnings"></param>
-        public Game(ISpinner spinner, IWinningsCalculator winnings, PlayerFinancesConfig player)
+        public Game(Reel[] reels, ISpinner spinner, IWinningsCalculator winnings, PlayerFinancesConfig player)
         {
             // TODO przerób na private, zrób Create()
 
+            Ensure.ParamNotNullOrEmpty(reels, nameof(reels));
             Ensure.ParamNotNull(spinner, nameof(spinner));
             Ensure.ParamNotNull(winnings, nameof(winnings));
             Ensure.ParamNotNull(player, nameof(player));
 
+            this.Reels = reels;
             this.Spinner = spinner;
             this.Winnings = winnings;
             this.Bet = player.Bet;
@@ -82,7 +92,7 @@ namespace CrazyBandit.Engine
             ISpinner spinner = new Spinner(new SpinnerConfig(gameConfig.Reels, gameConfig.ConfigRno, gameConfig.PayLines));
             IWinningsCalculator winnings = new WinningsCalculator(gameConfig.Winnings);
 
-            return new Game(spinner, winnings, gameConfig.ConfigPlayer);            
+            return new Game(gameConfig.Reels, spinner, winnings, gameConfig.ConfigPlayer);            
         }
         
 

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using CrazyBandit.Engine;
+using CrazyBandit.Engine.Config;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,16 +15,19 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace CrazyBandit.Console
+namespace CrazyBandit.Console.Views
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class GameMainWindow : Window
     {
-        public MainWindow()
+        public GameMainWindow()
         {
             InitializeComponent();
+
+            // model gry TODO - ma trafić do viewmodelu
+            Game game = Game.Create();
         }
     }
 }
