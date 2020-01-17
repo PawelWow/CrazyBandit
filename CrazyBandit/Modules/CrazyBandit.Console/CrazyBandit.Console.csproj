@@ -11,4 +11,8 @@
     <ProjectReference Include="..\CrazyBandit.Engine\CrazyBandit.Engine.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Resources\Images\Symbols\" />
+  </ItemGroup>
+
 </Project>

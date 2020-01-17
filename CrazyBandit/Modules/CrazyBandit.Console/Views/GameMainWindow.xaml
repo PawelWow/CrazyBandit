@@ -6,7 +6,40 @@
         xmlns:local="clr-namespace:CrazyBandit.Console"
         mc:Ignorable="d"
         Title="CrazyBandit" Height="450" Width="800">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Themes/GameMainWindowStyle.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
     <Grid>
+        <StackPanel>
+            <Grid HorizontalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="50" />
+                    <ColumnDefinition Width="50" />
+                    <ColumnDefinition Width="50" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="150" />                    
+                </Grid.RowDefinitions>                
+                
+                
+            </Grid>
+            
+            
+            <DockPanel HorizontalAlignment="Center" Style="{StaticResource GameStateRibbon}">
+                <TextBlock>Bet: </TextBlock>
+                <TextBlock Text="{Binding Bet, FallbackValue=0}" FontWeight="Bold" />
+                <TextBlock>Balance:</TextBlock>
+                <TextBlock Text="{Binding Balance, FallbackValue=0}" FontWeight="Bold" />
+                <TextBlock>CurrentWin: </TextBlock>
+                <TextBlock Text="{Binding CurrentWin, FallbackValue=0}" FontWeight="Bold" />
+                <Button HorizontalAlignment="Left" Width="75">Start</Button>
+            </DockPanel>
+            
+        </StackPanel>
 
     </Grid>
 </Window>
