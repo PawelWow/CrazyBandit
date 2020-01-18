@@ -7,12 +7,30 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CrazyBandit.Engine.Config\CrazyBandit.Engine.Config.csproj" />
-    <ProjectReference Include="..\CrazyBandit.Engine\CrazyBandit.Engine.csproj" />
+    <None Remove="Resources\Images\Symbols\B.png" />
+    <None Remove="Resources\Images\Symbols\Cherry.png" />
+    <None Remove="Resources\Images\Symbols\Dollar.png" />
+    <None Remove="Resources\Images\Symbols\Horseshoe.png" />
+    <None Remove="Resources\Images\Symbols\Joker.png" />
+    <None Remove="Resources\Images\Symbols\MoneyBag.png" />
+    <None Remove="Resources\Images\Symbols\Paragraph.png" />
+    <None Remove="Resources\Images\Symbols\Seven.png" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Resources\Images\Symbols\" />
+    <Resource Include="Resources\Images\Symbols\B.png" />
+    <Resource Include="Resources\Images\Symbols\Cherry.png" />
+    <Resource Include="Resources\Images\Symbols\Dollar.png" />
+    <Resource Include="Resources\Images\Symbols\Horseshoe.png" />
+    <Resource Include="Resources\Images\Symbols\Joker.png" />
+    <Resource Include="Resources\Images\Symbols\MoneyBag.png" />
+    <Resource Include="Resources\Images\Symbols\Paragraph.png" />
+    <Resource Include="Resources\Images\Symbols\Seven.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CrazyBandit.Engine.Config\CrazyBandit.Engine.Config.csproj" />
+    <ProjectReference Include="..\CrazyBandit.Engine\CrazyBandit.Engine.csproj" />
   </ItemGroup>
 
 </Project>
