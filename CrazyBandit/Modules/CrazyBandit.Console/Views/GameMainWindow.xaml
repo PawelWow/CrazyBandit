@@ -23,9 +23,32 @@
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="150" />                    
-                </Grid.RowDefinitions>                
-                
-                
+                </Grid.RowDefinitions>
+
+                <ScrollViewer Grid.Row="0" Grid.Column="0" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden">
+                    <StackPanel>
+                        <Image Source="{Binding Reel1[0]}" Width="50" Height="50" />
+                        <Image Source="{Binding Reel1[1]}" Width="50" Height="50" />
+                        <Image Source="{Binding Reel1[2]}" Width="50" Height="50" />
+                    </StackPanel>
+                </ScrollViewer>
+
+                <ScrollViewer Grid.Row="0" Grid.Column="1" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden">
+                    <StackPanel>
+                        <Image Source="{Binding Reel2[0]}" Width="50" Height="50" />
+                        <Image Source="{Binding Reel2[1]}" Width="50" Height="50" />
+                        <Image Source="{Binding Reel2[2]}" Width="50" Height="50" />
+                    </StackPanel>
+                </ScrollViewer>
+
+                <ScrollViewer Grid.Row="0" Grid.Column="2" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden">
+                    <StackPanel>
+                        <Image Source="{Binding Reel3[0]}" Width="50" Height="50" />
+                        <Image Source="{Binding Reel3[1]}" Width="50" Height="50" />
+                        <Image Source="{Binding Reel3[2]}" Width="50" Height="50" />
+                    </StackPanel>
+                </ScrollViewer>
+
             </Grid>
             
             
@@ -36,7 +59,7 @@
                 <TextBlock Text="{Binding Balance, FallbackValue=0}" FontWeight="Bold" />
                 <TextBlock>CurrentWin: </TextBlock>
                 <TextBlock Text="{Binding CurrentWin, FallbackValue=0}" FontWeight="Bold" />
-                <Button HorizontalAlignment="Left" Width="75">Start</Button>
+                <Button HorizontalAlignment="Left" Width="75" Command="{Binding Spin}">Start</Button>
             </DockPanel>
             
         </StackPanel>

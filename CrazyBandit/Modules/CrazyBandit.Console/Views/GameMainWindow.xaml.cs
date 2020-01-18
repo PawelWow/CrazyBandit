@@ -1,4 +1,5 @@
-﻿using CrazyBandit.Engine;
+﻿using CrazyBandit.Console.ViewModels;
+using CrazyBandit.Engine;
 using CrazyBandit.Engine.Config;
 using System;
 using System.Collections.Generic;
@@ -24,10 +25,8 @@ namespace CrazyBandit.Console.Views
     {
         public GameMainWindow()
         {
-            InitializeComponent();
-
-            // model gry TODO - ma trafić do viewmodelu
-            Game game = Game.Create();
+            InitializeComponent();                      
+            this.DataContext = new GameMainWindowViewModel(Game.Create());
         }
     }
 }

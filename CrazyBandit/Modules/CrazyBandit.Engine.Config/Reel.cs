@@ -1,5 +1,6 @@
 ﻿using CrazyBandit.Common;
 using System;
+using System.Collections.Generic;
 
 namespace CrazyBandit.Engine.Config
 {
@@ -12,6 +13,11 @@ namespace CrazyBandit.Engine.Config
         /// Symbole tegoż walca
         /// </summary>
         public int[] Symbols { get; }
+
+        /// <summary>
+        /// Ile razy dany symbol występuje na walcu (klucz: nr symbolu, value: ilość wystąpień)
+        /// </summary>
+        public Dictionary<int, int> SymbolsOccurance { get; private set; }
 
         /// <summary>
         /// Ile symboli przelatuje przy pojedynczym zakręceniu tym walcem?
@@ -33,7 +39,30 @@ namespace CrazyBandit.Engine.Config
             }
 
             this.Symbols = symbols;
+            this.SymbolsOccurance = this.CountSymbolsOccurance(symbols);
             this.Spin = spin;
+        }
+
+        /// <summary>
+        /// Buduje statystyki wystąpienia danych symboli
+        /// </summary>
+        /// <param name="symbolsAll"></param>
+        /// <returns></returns>
+        private Dictionary<int, int> CountSymbolsOccurance(int[] symbolsAll)
+        {
+            Dictionary<int, int> occurance = new Dictionary<int, int>();
+            foreach (int symbol in symbolsAll)
+            {
+                if (occurance.ContainsKey(symbol))
+                {
+                    occurance[symbol]++;
+                }
+                else
+                {
+                    occurance.Add(symbol, 1);
+                }
+            }
+            return occurance;
         }
     }
 }

@@ -9,6 +9,10 @@ namespace CrazyBandit.Engine.Config
     public class SpinnerConfig
     {
         /// <summary>
+        /// Definicje walców
+        /// </summary>
+        public Reel[] Reels { get; private set; }
+        /// <summary>
         /// <inheritdoc/>
         /// </summary>
         public int[][] Lines { get; private set; }
@@ -39,6 +43,7 @@ namespace CrazyBandit.Engine.Config
             Ensure.ParamNotNullOrEmpty(reels, nameof(reels));
             Ensure.ParamNotNull(rnoConfig, nameof(rnoConfig));
 
+            this.Reels = reels;
             this.Spin = this.GetSpins(reels);   
             
             // TODO jeszcze premyśleć. Ten composer powinien być w engine, a nie w configach

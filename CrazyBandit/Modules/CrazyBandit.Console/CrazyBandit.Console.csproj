@@ -7,25 +7,25 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Resources\Images\Symbols\B.png" />
-    <None Remove="Resources\Images\Symbols\Cherry.png" />
-    <None Remove="Resources\Images\Symbols\Dollar.png" />
-    <None Remove="Resources\Images\Symbols\Horseshoe.png" />
-    <None Remove="Resources\Images\Symbols\Joker.png" />
-    <None Remove="Resources\Images\Symbols\MoneyBag.png" />
-    <None Remove="Resources\Images\Symbols\Paragraph.png" />
-    <None Remove="Resources\Images\Symbols\Seven.png" />
+    <None Remove="Resources\Images\Symbols\0.png" />
+    <None Remove="Resources\Images\Symbols\1.png" />
+    <None Remove="Resources\Images\Symbols\2.png" />
+    <None Remove="Resources\Images\Symbols\3.png" />
+    <None Remove="Resources\Images\Symbols\4.png" />
+    <None Remove="Resources\Images\Symbols\5.png" />
+    <None Remove="Resources\Images\Symbols\6.png" />
+    <None Remove="Resources\Images\Symbols\7.png" />
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Resources\Images\Symbols\B.png" />
-    <Resource Include="Resources\Images\Symbols\Cherry.png" />
-    <Resource Include="Resources\Images\Symbols\Dollar.png" />
-    <Resource Include="Resources\Images\Symbols\Horseshoe.png" />
-    <Resource Include="Resources\Images\Symbols\Joker.png" />
-    <Resource Include="Resources\Images\Symbols\MoneyBag.png" />
-    <Resource Include="Resources\Images\Symbols\Paragraph.png" />
-    <Resource Include="Resources\Images\Symbols\Seven.png" />
+    <Resource Include="Resources\Images\Symbols\0.png" />
+    <Resource Include="Resources\Images\Symbols\1.png" />
+    <Resource Include="Resources\Images\Symbols\2.png" />
+    <Resource Include="Resources\Images\Symbols\3.png" />
+    <Resource Include="Resources\Images\Symbols\4.png" />
+    <Resource Include="Resources\Images\Symbols\5.png" />
+    <Resource Include="Resources\Images\Symbols\6.png" />
+    <Resource Include="Resources\Images\Symbols\7.png" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,6 +1,7 @@
 ﻿using CrazyBandit.Common;
 using CrazyBandit.Engine.Config;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CrazyBandit.Engine
 {
@@ -38,6 +39,10 @@ namespace CrazyBandit.Engine
         /// </summary>
         public int Rno { get; private set; }
 
+        // TODO - dokończyć sprawę z builderem - ma być czy nie? Przy spinie jest za male zróżnicowanie znaków
+        // TODO - trebaby zrobić 
+        PayLinesBuilder _linesBuilder;
+
         /// <summary>
         /// Konstruktor spinnera
         /// </summary>
@@ -50,8 +55,11 @@ namespace CrazyBandit.Engine
             _linesSearcher = new LinesSearcher(config.Lines);
 
             this.Lines = config.Lines;     
-            this.Rno = config.Rno;                                 
-            this.PayLines = this.CreateInitialWinningLine(config);            
+            this.Rno = config.Rno;
+
+            _linesBuilder = new PayLinesBuilder(config.Lines, config.PayLines, config.Reels);
+
+            this.PayLines = _linesBuilder.GetPayLines(config.Rno);          
         }
 
         /// <summary>
@@ -66,7 +74,10 @@ namespace CrazyBandit.Engine
 
                 for (int reelIndex = 0; reelIndex < previousWinningLine.Line.Length; reelIndex++)
                 {
-                    // index po zakręceniu bębnem
+                    // index po zakręceniu bębnem (skorygowany o spin)
+
+                    //  TODO Większą różnorodność trzeba zrobić, albo coś nie tak jest z wybieraniem linii
+
                     int reelSpinIndex = previousWinningLine.Index + _spin[reelIndex];
                     if (reelSpinIndex > this.Lines.Length)
                     {
@@ -100,7 +111,7 @@ namespace CrazyBandit.Engine
 
             for (int linesIndex = config.Rno, done = 0; done < config.PayLines; linesIndex++, done++)
             {
-                if (linesIndex > this.Lines.Length - 1)
+                if (linesIndex > config.Lines.Length - 1)
                 {
                     //Przekręcamy licznik
                     linesIndex = 0;
@@ -110,6 +121,138 @@ namespace CrazyBandit.Engine
             }
 
             return winningLines;
+        }
+
+
+
+        // ile razy dany symbol moze wystąpić na danym walcu?
+
+        /// <summary>
+        /// Buduje linie wygrywające zgodnie z możliwościami walca
+        /// </summary>
+        private class PayLinesBuilder
+        {
+            private readonly Reel[] _reels;
+            
+ 
+            private readonly int[][] _lines;
+
+            /// <summary>
+            /// Dopuszczalna ilość linii
+            /// </summary>
+            private readonly int _linesQuantity;
+
+            public PayLinesBuilder(int[][] lines, int linesQuantity, Reel[] reels)
+            {
+                
+                _lines = lines;
+                _linesQuantity = linesQuantity;
+                _reels = reels;
+            }
+
+            /// <summary>
+            /// Tworzy wyzerowaną matrycę wystąpień symboli dla wszystkich walców
+            /// </summary>
+            /// <returns></returns>
+            private Dictionary<int, Dictionary<int, int>> CreateSymbolsOccurancesTable()
+            {
+                Dictionary<int, Dictionary<int, int>> reelSymbolsOccurance = new Dictionary<int, Dictionary<int, int>>();
+                for (int reel = 0; reel < this._reels.Length; reel++)
+                {
+                    Dictionary<int, int> symbolOccurance = new Dictionary<int, int>();
+                    foreach (int symbol in this._reels[reel].Symbols)
+                    {
+                        if (symbolOccurance.ContainsKey(symbol) == false)
+                        {
+                            symbolOccurance.Add(symbol, 0);
+                        }
+                    }
+
+                    reelSymbolsOccurance.Add(reel, symbolOccurance);
+                }
+
+                return reelSymbolsOccurance;
+            }
+
+            /// <summary>
+            /// Bierze pożądaną ilość linii począwszy od zadanego indexu
+            /// </summary>
+            /// <param name="startIndex"></param>
+            /// <returns></returns>
+            public IEnumerable<PayLine> GetPayLines(int startIndex)
+            {
+                List<PayLine> winningLines = new List<PayLine>();
+                
+                Dictionary<int, Dictionary<int, int>> reelSymbolsOccurance = this.CreateSymbolsOccurancesTable();
+
+                int[] previousLine = null;
+                for (int lineIndex = startIndex, done = 0, maxAttemptesAfterFail = _lines.Length; 
+                    done < _linesQuantity && maxAttemptesAfterFail > 0; 
+                    lineIndex++, done++)
+                {
+                    if (lineIndex > _lines.Length - 1)
+                    {
+                        //Przekręcamy licznik
+                        lineIndex = 0;
+                    }
+
+                    int[] line = _lines[lineIndex];
+                    if (this.IsLineValid(reelSymbolsOccurance, line, previousLine) == false)
+                    {                        
+                        done--;
+
+                        // Podejmiemy tyle prób, ile jest linii
+                        maxAttemptesAfterFail--;
+
+                        // Przechodzimy do następnej linii, bo tej wziąć nie możemy
+                        continue;
+                    }
+
+                    // Dodajemy do wyników
+                    winningLines.Add(new PayLine(lineIndex, line));
+
+                    // Podbijamy occurance dla każdego symbolu
+                    for (int reel = 0; reel < line.Length; reel++)
+                    {
+                        int reelSymbol = line[reel];
+                        reelSymbolsOccurance[reel][reelSymbol]++;
+                    }
+
+                    previousLine = line;
+                }
+
+                return winningLines;
+            }
+
+            // REV swoją drogą możliwe, że powinniśmy tutaj też brać pod uwagę kolejność symboli na walcach.
+
+            /// <summary>
+            /// Decyduje czy linia może być dodana - jest to określane przez ilość symboli, które powtarzają się na walcu
+            /// 
+            /// </summary>
+            /// <param name="reelSymbolsOccurance"></param>
+            /// <param name="line"></param>
+            /// <returns></returns>
+            private bool IsLineValid(Dictionary<int, Dictionary<int, int>> reelSymbolsOccurance, int[] line, int[] previousLine)
+            {
+                for (int reel = 0; reel < line.Length; reel++)
+                {
+                    int symbol = line[reel];
+                    if (reelSymbolsOccurance[reel][symbol] >= _reels[reel].SymbolsOccurance[symbol])
+                    {
+                        return false;
+
+                    }
+
+                    if (previousLine != null && previousLine[reel] == symbol)
+                    {
+                        //  Nie chcemy powtarzać tych samych symboli
+                        return false;
+                    }
+                }
+
+                return true;
+            }
         }
     }
 }
