@@ -28,10 +28,10 @@ namespace CrazyBandit.Engine
         /// <summary>
         /// Próbuje znaleźć daną linię  w całej kolekcji. Rzuci wyjątek jak nic nie znajdzie, jeśli ktoś poda linie, której nie ma w kolekcji.
         /// </summary>
-        /// <param name="startIndex">Od jakiego miejsca ma szukać?</param>
+        /// <param name="startIndex">Od którego miejsca szukamy? (wyłącznie, bo zaczniemy od następnego). -1 oznacza, żę od początku</param>
         /// <param name="line">szukana linia</param>
         /// <returns></returns>
-        public PayLine Find(int[] line, int startIndex = 0)
+        public PayLine Find(int[] line, int startIndex = -1)
         {
             PayLine result = this.Search(startIndex, line);
 
@@ -46,7 +46,7 @@ namespace CrazyBandit.Engine
             }
 
             // nie znaleziono - może dojechaliśmy do końca walca - to lecimy od początku
-            result = this.Search(0, line);
+            result = this.Search(-1, line);
             if (IsFound(result))
             {
                 return result;
@@ -60,12 +60,12 @@ namespace CrazyBandit.Engine
         /// <summary>
         /// Helper dokonujący właściwego wyszukiwania
         /// </summary>
-        /// <param name="startIndex">Od którego miejsca startujemy</param>
+        /// <param name="startIndex">Od którego miejsca startujemy? wyszukiwanie zacznie się od miejsca po nim. </param>
         /// <param name="line">Szukana linia</param>
         /// <returns>Albo zwrócimy linię, albo pusto.</returns>
         private PayLine Search(int startIndex, int[] line)
         {          
-            for (int linesIndex = startIndex; linesIndex < this.Lines.Length; linesIndex++)
+            for (int linesIndex = startIndex++; linesIndex < this.Lines.Length; linesIndex++)
             {
                 if (this.Lines[linesIndex].SequenceEqual(line))
                 {
