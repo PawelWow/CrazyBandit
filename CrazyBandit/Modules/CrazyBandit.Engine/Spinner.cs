@@ -74,12 +74,9 @@ namespace CrazyBandit.Engine
 
                 for (int reelIndex = 0; reelIndex < previousWinningLine.Line.Length; reelIndex++)
                 {
-                    // index po zakręceniu bębnem (skorygowany o spin)
-
-                    //  TODO Większą różnorodność trzeba zrobić, albo coś nie tak jest z wybieraniem linii
-
+                    // index po zakręceniu bębnem (skorygowany o spin)                
                     int reelSpinIndex = previousWinningLine.Index + _spin[reelIndex];
-                    if (reelSpinIndex > this.Lines.Length)
+                    if (reelSpinIndex >= this.Lines.Length)
                     {
                         // Skoro przekręciliśmy licznik - to zaczynamy od nowa
                         reelSpinIndex -= this.Lines.Length;
