@@ -15,7 +15,7 @@ namespace CrazyBandit.Engine
         /// <summary>
         /// Linie ułożone po zakręceniu - mogą być zwycięskie lub nie
         /// </summary>
-        IEnumerable<PayLine> PayLines { get; }
+        PayLine[] PayLines { get; }
 
         /// <summary>
         /// Aktualny numer zakręcenia bębna

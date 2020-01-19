@@ -27,25 +27,25 @@
 
                 <ScrollViewer Grid.Row="0" Grid.Column="0" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden">
                     <StackPanel>
-                        <Image Source="{Binding Reel1[0]}" Width="50" Height="50" />
-                        <Image Source="{Binding Reel1[1]}" Width="50" Height="50" />
-                        <Image Source="{Binding Reel1[2]}" Width="50" Height="50" />
+                        <Image Source="{Binding Reel1[0].Image}" Width="50" Height="50" />
+                        <Image Source="{Binding Reel1[1].Image}" Width="50" Height="50" />
+                        <Image Source="{Binding Reel1[2].Image}" Width="50" Height="50" />
                     </StackPanel>
                 </ScrollViewer>
 
                 <ScrollViewer Grid.Row="0" Grid.Column="1" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden">
                     <StackPanel>
-                        <Image Source="{Binding Reel2[0]}" Width="50" Height="50" />
-                        <Image Source="{Binding Reel2[1]}" Width="50" Height="50" />
-                        <Image Source="{Binding Reel2[2]}" Width="50" Height="50" />
+                        <Image Source="{Binding Reel2[0].Image}" Width="50" Height="50" />
+                        <Image Source="{Binding Reel2[1].Image}" Width="50" Height="50" />
+                        <Image Source="{Binding Reel2[2].Image}" Width="50" Height="50" />
                     </StackPanel>
                 </ScrollViewer>
 
                 <ScrollViewer Grid.Row="0" Grid.Column="2" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden">
                     <StackPanel>
-                        <Image Source="{Binding Reel3[0]}" Width="50" Height="50" />
-                        <Image Source="{Binding Reel3[1]}" Width="50" Height="50" />
-                        <Image Source="{Binding Reel3[2]}" Width="50" Height="50" />
+                        <Image Source="{Binding Reel3[0].Image}" Width="50" Height="50" />
+                        <Image Source="{Binding Reel3[1].Image}" Width="50" Height="50" />
+                        <Image Source="{Binding Reel3[2].Image}" Width="50" Height="50" />
                     </StackPanel>
                 </ScrollViewer>
 

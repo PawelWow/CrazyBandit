@@ -16,12 +16,19 @@ namespace CrazyBandit.Engine
         private readonly int[] _spin;
 
         /// <summary>
+        /// Walce
+        /// </summary>
+        private readonly Reel[] _reels;
+
+        /// <summary>
         /// Do wyszukiwania ułożónej linii w całej kolekcji.
         /// </summary>
         private readonly LinesSearcher _linesSearcher;
 
+        private readonly int _payLinesQuantity;
+
         /// <summary>
-        /// <inheritdoc />
+        /// Wszystkie możliwe linie
         /// </summary>
         public int[][] Lines
         {
@@ -32,16 +39,12 @@ namespace CrazyBandit.Engine
         /// <summary>
         /// Linie, które mogą okazać się wygrywające
         /// </summary>
-        public IEnumerable<PayLine> PayLines { get; private set; }
+        public PayLine[] PayLines { get; private set; }
 
         /// <summary>
         /// Numer zakręcenia - jednocześnie jest to pozycja pierwszej linii wygrywającej.
         /// </summary>
         public int Rno { get; private set; }
-
-        // TODO - dokończyć sprawę z builderem - ma być czy nie? Przy spinie jest za male zróżnicowanie znaków
-        // TODO - trebaby zrobić 
-        PayLinesBuilder _linesBuilder;
 
         /// <summary>
         /// Konstruktor spinnera
@@ -57,9 +60,11 @@ namespace CrazyBandit.Engine
             this.Lines = config.Lines;     
             this.Rno = config.Rno;
 
-            _linesBuilder = new PayLinesBuilder(config.Lines, config.PayLines, config.Reels);
+            
+            _reels = config.Reels;            
+            _payLinesQuantity = config.PayLines;            
 
-            this.PayLines = _linesBuilder.GetPayLines(config.Rno);          
+            this.PayLines = this.CreateInitialWinningLine(config);          
         }
 
         /// <summary>
@@ -67,15 +72,26 @@ namespace CrazyBandit.Engine
         /// </summary>
         public void Spin()
         {
-            List<PayLine> winningLines = new List<PayLine>();
-            foreach (var previousWinningLine in this.PayLines)
-            {
-                int[] line = new int[previousWinningLine.Line.Length];
 
-                for (int reelIndex = 0; reelIndex < previousWinningLine.Line.Length; reelIndex++)
+            // TODO ReelsSymbolsOccurance
+
+            Dictionary<int, Dictionary<int, int>> reelSymbolsOccurance = this.CreateSymbolsOccurancesTable();
+
+            PayLine[] winningLines = new PayLine[_payLinesQuantity];
+
+            int[] previousLine = null;
+
+            int lineAttempt = 0;
+            // Jeśli danej linii nie udało się zrobić to podbijamy index            
+            for (int lineIndex = 0, maxAttemptesAfterFail = this.Lines.Length; lineIndex < _payLinesQuantity; lineIndex++, maxAttemptesAfterFail--)
+            {
+                PayLine previousPayLine = this.PayLines[lineIndex];
+                int[] lineChoosen = new int[previousPayLine.Line.Length];
+
+                for (int reelIndex = 0; reelIndex < previousPayLine.Line.Length; reelIndex++)
                 {
-                    // index po zakręceniu bębnem (skorygowany o spin)                
-                    int reelSpinIndex = previousWinningLine.Index + _spin[reelIndex];
+                    // index po zakręceniu bębnem (skorygowany o spin). Jeśli ostatnia próba nie powiodła się to korygujemy index o 1         
+                    int reelSpinIndex = previousPayLine.Index + _spin[reelIndex] + lineAttempt;
                     if (reelSpinIndex >= this.Lines.Length)
                     {
                         // Skoro przekręciliśmy licznik - to zaczynamy od nowa
@@ -84,172 +100,157 @@ namespace CrazyBandit.Engine
 
                     int reelSymbol = this.Lines[reelSpinIndex][reelIndex];
 
-                    line[reelIndex] = reelSymbol;
+                    lineChoosen[reelIndex] = reelSymbol;
+
+
+                }
+
+                // Jeśli linia niewalidna i mamy jeszce próby to 
+                if (this.IsLineValid(reelSymbolsOccurance, lineChoosen, previousLine) == false && lineAttempt < this.Lines.Length)
+                {
+                    // To będzie kolejna próba
+                    lineAttempt++;
+
+                    lineIndex--;
+
+                    // TODO co z tymi próbami?
+
+                    // Podejmiemy tyle prób, ile jest linii
+                    maxAttemptesAfterFail--;
+
+                    // Przechodzimy do następnej linii, bo tej wziąć nie możemy
+                    continue;
                 }
 
                 // Mamy całą linię, teraz musimy odszukać ją w tablicy, bo walce mogą kręcić się o różne wartości
                 // ważne, żeby zacząć szukać od poprzedniego miejsca
 
-                winningLines.Add(_linesSearcher.Find(line, previousWinningLine.Index));
+                winningLines[lineIndex] = _linesSearcher.Find(lineChoosen, previousPayLine.Index);
+                lineAttempt = 0;
+
+                // Podbijamy occurance dla każdego symbolu
+                for (int reel = 0; reel < lineChoosen.Length; reel++)
+                {
+                    int reelSymbol = lineChoosen[reel];
+                    reelSymbolsOccurance[reel][reelSymbol]++;
+                }
+
+                previousLine = lineChoosen;
+
             }
+
+            // TODO - kiedy nie będziemy w stanie ułożyć tych linii? Może ilość prób jest tutaj zbędne? Może trzeba założyć mniejsze zło
+            // i jeśli jakiś config nie pozwoli nam na wygenerowanie takich liczb to ustawimy przypadkowe wyniki?
+            // TODO przeanalizować i opisać algorytm
 
             this.PayLines = winningLines;
             this.Rno++;
         }
 
-         /// <summary>
+
+
+        /// <summary>
         /// Helper tworzący początkowe ustawienia walców. Początkowa pozycja brana jest z <see cref="SpinnerConfig.Rno"/>
         /// </summary>
         /// <param name="config">Konfiguracja spinnera</param>        
         /// <returns>Linie ustalane na początku gry.</returns>
-        private IEnumerable<PayLine> CreateInitialWinningLine(SpinnerConfig config)
+        private PayLine[] CreateInitialWinningLine(SpinnerConfig config)
         {
-            List<PayLine> winningLines = new List<PayLine>();
 
-            for (int linesIndex = config.Rno, done = 0; done < config.PayLines; linesIndex++, done++)
+            PayLine[] winningLines = new PayLine[config.PayLines];
+
+            Dictionary<int, Dictionary<int, int>> reelSymbolsOccurance = this.CreateSymbolsOccurancesTable();
+
+            int[] previousLine = null;
+            for (int lineIndex = config.Rno, done = 0, maxAttemptesAfterFail = config.Lines.Length;
+                done < config.PayLines && maxAttemptesAfterFail > 0;
+                lineIndex++, done++)
             {
-                if (linesIndex > config.Lines.Length - 1)
+                if (lineIndex > config.Lines.Length - 1)
                 {
                     //Przekręcamy licznik
-                    linesIndex = 0;
+                    lineIndex = 0;
                 }
 
-                winningLines.Add(new PayLine(linesIndex, config.Lines[linesIndex]));
+                int[] line = config.Lines[lineIndex];
+                if (this.IsLineValid(reelSymbolsOccurance, line, previousLine) == false)
+                {
+                    done--;
+
+                    // Podejmiemy tyle prób, ile jest linii
+                    maxAttemptesAfterFail--;
+
+                    // Przechodzimy do następnej linii, bo tej wziąć nie możemy
+                    continue;
+                }
+
+                // Dodajemy do wyników nową linię
+                winningLines[done] = new PayLine(lineIndex, line);
+                
+                // Podbijamy occurance dla każdego symbolu
+                for (int reel = 0; reel < line.Length; reel++)
+                {
+                    int reelSymbol = line[reel];
+                    reelSymbolsOccurance[reel][reelSymbol]++;
+                }
+
+                previousLine = line;
             }
 
             return winningLines;
         }
 
 
+        /// <summary>
+        /// Tworzy wyzerowaną matrycę wystąpień symboli dla wszystkich walców
+        /// </summary>
+        /// <returns></returns>
+        private Dictionary<int, Dictionary<int, int>> CreateSymbolsOccurancesTable()
+        {
+            Dictionary<int, Dictionary<int, int>> reelSymbolsOccurance = new Dictionary<int, Dictionary<int, int>>();
+            for (int reel = 0; reel < _reels.Length; reel++)
+            {
+                Dictionary<int, int> symbolOccurance = new Dictionary<int, int>();
+                foreach (int symbol in _reels[reel].Symbols)
+                {
+                    if (symbolOccurance.ContainsKey(symbol) == false)
+                    {
+                        symbolOccurance.Add(symbol, 0);
+                    }
+                }
 
-        // ile razy dany symbol moze wystąpić na danym walcu?
+                reelSymbolsOccurance.Add(reel, symbolOccurance);
+            }
+
+            return reelSymbolsOccurance;
+        }
 
         /// <summary>
-        /// Buduje linie wygrywające zgodnie z możliwościami walca
+        /// Decyduje czy linia może być dodana - jest to określane przez ilość symboli, które powtarzają się na walcu
+        /// 
         /// </summary>
-        private class PayLinesBuilder
+        /// <param name="currnetReelSymbolsOccurance"></param>
+        /// <param name="line"></param>
+        /// <returns></returns>
+        private bool IsLineValid(Dictionary<int, Dictionary<int, int>> currnetReelSymbolsOccurance, int[] line, int[] previousLine)
         {
-            private readonly Reel[] _reels;
-            
- 
-            private readonly int[][] _lines;
-
-            /// <summary>
-            /// Dopuszczalna ilość linii
-            /// </summary>
-            private readonly int _linesQuantity;
-
-            public PayLinesBuilder(int[][] lines, int linesQuantity, Reel[] reels)
+            for (int reel = 0; reel < line.Length; reel++)
             {
-                
-                _lines = lines;
-                _linesQuantity = linesQuantity;
-                _reels = reels;
-            }
-
-            /// <summary>
-            /// Tworzy wyzerowaną matrycę wystąpień symboli dla wszystkich walców
-            /// </summary>
-            /// <returns></returns>
-            private Dictionary<int, Dictionary<int, int>> CreateSymbolsOccurancesTable()
-            {
-                Dictionary<int, Dictionary<int, int>> reelSymbolsOccurance = new Dictionary<int, Dictionary<int, int>>();
-                for (int reel = 0; reel < this._reels.Length; reel++)
+                int symbol = line[reel];
+                if (currnetReelSymbolsOccurance[reel][symbol] >= _reels[reel].SymbolsOccurance[symbol])
                 {
-                    Dictionary<int, int> symbolOccurance = new Dictionary<int, int>();
-                    foreach (int symbol in this._reels[reel].Symbols)
-                    {
-                        if (symbolOccurance.ContainsKey(symbol) == false)
-                        {
-                            symbolOccurance.Add(symbol, 0);
-                        }
-                    }
+                    return false;
 
-                    reelSymbolsOccurance.Add(reel, symbolOccurance);
                 }
 
-                return reelSymbolsOccurance;
-            }
-
-            /// <summary>
-            /// Bierze pożądaną ilość linii począwszy od zadanego indexu
-            /// </summary>
-            /// <param name="startIndex"></param>
-            /// <returns></returns>
-            public IEnumerable<PayLine> GetPayLines(int startIndex)
-            {
-                List<PayLine> winningLines = new List<PayLine>();
-                
-                Dictionary<int, Dictionary<int, int>> reelSymbolsOccurance = this.CreateSymbolsOccurancesTable();
-
-                int[] previousLine = null;
-                for (int lineIndex = startIndex, done = 0, maxAttemptesAfterFail = _lines.Length; 
-                    done < _linesQuantity && maxAttemptesAfterFail > 0; 
-                    lineIndex++, done++)
+                if (previousLine != null && previousLine[reel] == symbol)
                 {
-                    if (lineIndex > _lines.Length - 1)
-                    {
-                        //Przekręcamy licznik
-                        lineIndex = 0;
-                    }
-
-                    int[] line = _lines[lineIndex];
-                    if (this.IsLineValid(reelSymbolsOccurance, line, previousLine) == false)
-                    {                        
-                        done--;
-
-                        // Podejmiemy tyle prób, ile jest linii
-                        maxAttemptesAfterFail--;
-
-                        // Przechodzimy do następnej linii, bo tej wziąć nie możemy
-                        continue;
-                    }
-
-                    // Dodajemy do wyników
-                    winningLines.Add(new PayLine(lineIndex, line));
-
-                    // Podbijamy occurance dla każdego symbolu
-                    for (int reel = 0; reel < line.Length; reel++)
-                    {
-                        int reelSymbol = line[reel];
-                        reelSymbolsOccurance[reel][reelSymbol]++;
-                    }
-
-                    previousLine = line;
+                    //  Nie chcemy powtarzać tych samych symboli
+                    return false;
                 }
-
-                return winningLines;
             }
 
-            // REV swoją drogą możliwe, że powinniśmy tutaj też brać pod uwagę kolejność symboli na walcach.
-
-            /// <summary>
-            /// Decyduje czy linia może być dodana - jest to określane przez ilość symboli, które powtarzają się na walcu
-            /// 
-            /// </summary>
-            /// <param name="reelSymbolsOccurance"></param>
-            /// <param name="line"></param>
-            /// <returns></returns>
-            private bool IsLineValid(Dictionary<int, Dictionary<int, int>> reelSymbolsOccurance, int[] line, int[] previousLine)
-            {
-                for (int reel = 0; reel < line.Length; reel++)
-                {
-                    int symbol = line[reel];
-                    if (reelSymbolsOccurance[reel][symbol] >= _reels[reel].SymbolsOccurance[symbol])
-                    {
-                        return false;
-
-                    }
-
-                    if (previousLine != null && previousLine[reel] == symbol)
-                    {
-                        //  Nie chcemy powtarzać tych samych symboli
-                        return false;
-                    }
-                }
-
-                return true;
-            }
+            return true;
         }
     }
 }
