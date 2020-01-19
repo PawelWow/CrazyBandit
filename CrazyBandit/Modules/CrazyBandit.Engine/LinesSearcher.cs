@@ -65,7 +65,7 @@ namespace CrazyBandit.Engine
         /// <returns>Albo zwrócimy linię, albo pusto.</returns>
         private PayLine Search(int startIndex, int[] line)
         {          
-            for (int linesIndex = startIndex++; linesIndex < this.Lines.Length; linesIndex++)
+            for (int linesIndex = ++startIndex; linesIndex < this.Lines.Length; linesIndex++)
             {
                 if (this.Lines[linesIndex].SequenceEqual(line))
                 {
