@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CrazyBandit.Console"
         mc:Ignorable="d"
-        Title="CrazyBandit" Height="450" Width="800">
+        Title="CrazyBandit" Height="400" Width="400" ResizeMode="NoResize">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -17,37 +17,31 @@
         <StackPanel>
             <Grid HorizontalAlignment="Center">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="50" />
-                    <ColumnDefinition Width="50" />
-                    <ColumnDefinition Width="50" />
+                    <ColumnDefinition Width="100" />
+                    <ColumnDefinition Width="100" />
+                    <ColumnDefinition Width="100" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="150" />                    
+                    <RowDefinition Height="300" />                    
                 </Grid.RowDefinitions>
 
-                <ScrollViewer Grid.Row="0" Grid.Column="0" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden">
-                    <StackPanel>
-                        <Image Source="{Binding Reel1[0].Image}" Width="50" Height="50" />
-                        <Image Source="{Binding Reel1[1].Image}" Width="50" Height="50" />
-                        <Image Source="{Binding Reel1[2].Image}" Width="50" Height="50" />
-                    </StackPanel>
-                </ScrollViewer>
+                <StackPanel Grid.Row="0" Grid.Column="0">
+                    <Image Source="{Binding Reel1[0].Image}" Width="100" Height="100" />
+                    <Image Source="{Binding Reel1[1].Image}" Width="100" Height="100" />
+                    <Image Source="{Binding Reel1[2].Image}" Width="100" Height="100" />
+                </StackPanel>
 
-                <ScrollViewer Grid.Row="0" Grid.Column="1" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden">
-                    <StackPanel>
-                        <Image Source="{Binding Reel2[0].Image}" Width="50" Height="50" />
-                        <Image Source="{Binding Reel2[1].Image}" Width="50" Height="50" />
-                        <Image Source="{Binding Reel2[2].Image}" Width="50" Height="50" />
-                    </StackPanel>
-                </ScrollViewer>
+                <StackPanel Grid.Row="0" Grid.Column="1">
+                    <Image Source="{Binding Reel2[0].Image}" Width="100" Height="100" />
+                    <Image Source="{Binding Reel2[1].Image}" Width="100" Height="100" />
+                    <Image Source="{Binding Reel2[2].Image}" Width="100" Height="100" />
+                </StackPanel>
 
-                <ScrollViewer Grid.Row="0" Grid.Column="2" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden">
-                    <StackPanel>
-                        <Image Source="{Binding Reel3[0].Image}" Width="50" Height="50" />
-                        <Image Source="{Binding Reel3[1].Image}" Width="50" Height="50" />
-                        <Image Source="{Binding Reel3[2].Image}" Width="50" Height="50" />
-                    </StackPanel>
-                </ScrollViewer>
+                <StackPanel Grid.Row="0" Grid.Column="2">
+                    <Image Source="{Binding Reel3[0].Image}" Width="100" Height="100" />
+                    <Image Source="{Binding Reel3[1].Image}" Width="100" Height="100" />
+                    <Image Source="{Binding Reel3[2].Image}" Width="100" Height="100" />
+                </StackPanel>
 
             </Grid>
             
