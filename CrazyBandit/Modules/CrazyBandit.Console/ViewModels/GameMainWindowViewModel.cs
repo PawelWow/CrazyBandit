@@ -5,15 +5,16 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Input;
 
 namespace CrazyBandit.Console.ViewModels
 {
+    /// <summary>
+    /// View model gry (okna <see cref="Views.GameMainWindow"/>
+    /// </summary>
     internal class GameMainWindowViewModel : Observed
-    {
+    {       
         /// <summary>
         /// Model gry
         /// </summary>
@@ -35,7 +36,7 @@ namespace CrazyBandit.Console.ViewModels
         /// <summary>
         /// Komenda rozpoczęcia gry
         /// </summary>
-        public ICommand Spin
+        public IAsyncCommand Spin
         {
             get;
             private set;
@@ -48,9 +49,9 @@ namespace CrazyBandit.Console.ViewModels
         public GameMainWindowViewModel(Game gameModel)
         {
             Ensure.ParamNotNull(gameModel, nameof(gameModel));
-            _gameModel = gameModel;
+            _gameModel = gameModel;          
 
-            this.Spin = new RelayCommand(async execute => await this.OnSpin());
+            this.Spin = new AsyncCommand(this.OnSpin);
             _reel1 = new ObservableCollection<Symbol>();
             _reel2 = new ObservableCollection<Symbol>();
             _reel3 = new ObservableCollection<Symbol>();
@@ -133,50 +134,47 @@ namespace CrazyBandit.Console.ViewModels
         /// </summary>
         private async Task DecorateTheSpin()
         {
-            int reel1start = this.Reel1[0].Id;
-            int reel2start = this.Reel2[0].Id;
-            int reel3start = this.Reel3[0].Id;
 
-            int reel1Symbols = this.Reel1.Count;
+            List<Task> tasks = new List<Task>
+            {
+                Task.Factory.StartNew( () => { this.AnimateReel(0, this.Reel1); }),
+                Task.Factory.StartNew( () => { this.AnimateReel(1, this.Reel2); }),
+                Task.Factory.StartNew( () => { this.AnimateReel(2, this.Reel3); })
+            };
 
-            var tasks = new List<Task>();
+            await Task.WhenAll(tasks);
+            
+            
+        }
 
-            tasks.Add(await Task.Factory.StartNew(
-                async () =>
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="reelNumber">Numer walca w modelu gry</param>
+        /// <param name="reelSymbols">Walec na widoku</param>        
+        private void AnimateReel(int reelNumber, ObservableCollection<Symbol> reelSymbols)
+        {
+
+            int[] reelSymbolsUnique = _gameModel.Reels[reelNumber].Symbols.Distinct().ToArray();   
+            
+            // enumerujemy po liczbie spinów, nie po indexie czyli od 1 do liczby spinów włącznie
+            for (int spin = 1; spin <= _gameModel.Reels[reelNumber].Spin; spin++)
+            {
+                int startIndex = Array.FindIndex(reelSymbolsUnique, s => s == reelSymbols[0].Value);
+                for (int line = 0; line < reelSymbols.Count; line++)
                 {
-                    List<int> previousSymbols = new List<int>();
-                    for (int i = 0; i < reel1Symbols; i++)
+                    startIndex++;
+                    if (startIndex >= reelSymbolsUnique.Length)
                     {
-                        int spin = 1;
-                        if (i == 0)
-                        {
-                            // Tu jest coś nie tak - nie przesuwa się
-                            spin = _gameModel.Reels[0].Spin + reel1start;
-                        }
-
-                        int symbol = spin;
-                        if (symbol >= _gameModel.Reels[0].Symbols.Length)
-                        {
-                            // korekta o przekroczoną ilość
-                            symbol -= _gameModel.Reels[0].Symbols.Length;
-                        }
-
-                        // TODO powinno być w oparciu o liczbę wystąpień
-                        if (previousSymbols.Any(s => s == symbol))
-                        {
-                            symbol = _gameModel.Reels[0].Symbols.FirstOrDefault(s => previousSymbols.Any(x => x != symbol));
-                        }
-                        previousSymbols.Add(symbol);
-
-                        this.Reel1[i] = new Symbol(symbol);
-
-                        await Task.Delay(300);
+                        startIndex = 0;
                     }
+
+                    int symbol = reelSymbolsUnique[startIndex];
+                    reelSymbols[line] = new Symbol(symbol);
                 }
 
-                ));
-
-            //Task.WaitAll(tasks.ToArray());
+                Task.Delay(300).GetAwaiter().GetResult();
+            }
         }
 
         /// <summary>

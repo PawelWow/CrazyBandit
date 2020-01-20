@@ -6,9 +6,9 @@
     internal class Symbol
     {
         /// <summary>
-        /// Id symbolu
+        /// Co to za symbol?
         /// </summary>
-        public int Id { get; private set; }
+        public int Value { get; private set; }
 
         /// <summary>
         /// Adres obrazka w resource'ach. Każdy symbol MUSI mieć tam swój obrazek.
@@ -17,7 +17,7 @@
         {
             get
             {
-                return $"/Resources/Images/Symbols/{this.Id}.png";
+                return $"/Resources/Images/Symbols/{this.Value}.png";
             }
         }
 
@@ -27,7 +27,7 @@
         /// <param name="id">Id symbolu, który ma być udekorowany.</param>
         public Symbol(int id)
         {
-            this.Id = id;
+            this.Value = id;
         }
     }
 }
