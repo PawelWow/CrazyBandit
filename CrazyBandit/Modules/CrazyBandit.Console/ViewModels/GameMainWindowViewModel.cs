@@ -32,6 +32,59 @@ namespace CrazyBandit.Console.ViewModels
         private ObservableCollection<Symbol> _reel2;
         private ObservableCollection<Symbol> _reel3;
 
+        private bool _isPayLine1;
+        private bool _isPayLine2;
+        private bool _isPayLine3;
+
+
+        /// <summary>
+        /// Czy pierwsza linia zwycięzyła
+        /// </summary>
+        public bool IsPayLine1
+        {
+            get
+            {
+                return _isPayLine1;                
+            }
+            set
+            {
+                _isPayLine1 = value;
+                base.OnPropertyChange(nameof(IsPayLine1));
+            }
+        }
+
+        /// <summary>
+        /// Czy pierwsza linia zwycięzyła
+        /// </summary>
+        public bool IsPayLine2
+        {
+            get
+            {
+                return _isPayLine2;
+            }
+            set
+            {
+                _isPayLine2 = value;
+                base.OnPropertyChange(nameof(IsPayLine2));
+            }
+        }
+
+        /// <summary>
+        /// Czy pierwsza linia zwycięzyła
+        /// </summary>
+        public bool IsPayLine3
+        {
+            get
+            {
+                return _isPayLine3;                
+            }
+            set
+            {
+                _isPayLine3 = value;
+                base.OnPropertyChange(nameof(IsPayLine3));
+            }
+        }
+
 
         /// <summary>
         /// Komenda rozpoczęcia gry
@@ -115,10 +168,24 @@ namespace CrazyBandit.Console.ViewModels
                     MessageBox.Show("Game over!");
                 }
 
+                this.IsPayLine1 = false;
+                this.IsPayLine2 = false;
+                this.IsPayLine3 = false;
+
+                // TODO zerowaie wyników potrzebne
+                //base.OnPropertyChange(nameof(this.CurrentWin), nameof(this.Balance));
+
                 await this.DecorateTheSpin();
 
-                _gameModel.Spinner.Spin();
+                _gameModel.Start();
                 this.SetReels(_gameModel.Spinner.PayLines);
+
+                this.IsPayLine1 = this.Reel1[0].IsWinning;
+                this.IsPayLine2 = this.Reel1[1].IsWinning;
+                this.IsPayLine3 = this.Reel1[2].IsWinning;
+
+                base.OnPropertyChange(nameof(this.CurrentWin), nameof(this.Balance));
+
             }
             catch (Exception ex)
             {
@@ -173,7 +240,7 @@ namespace CrazyBandit.Console.ViewModels
                     reelSymbols[line] = new Symbol(symbol);
                 }
 
-                Task.Delay(300).GetAwaiter().GetResult();
+                Task.Delay(100).GetAwaiter().GetResult();
             }
         }
 
@@ -199,9 +266,9 @@ namespace CrazyBandit.Console.ViewModels
                     continue;
                 }
 
-                Reel1.Add(new Symbol(winnerLine.Line[0]));
-                Reel2.Add(new Symbol(winnerLine.Line[1]));
-                Reel3.Add(new Symbol(winnerLine.Line[2]));
+                Reel1.Add(new Symbol(winnerLine.Line[0], winnerLine.IsWinningLine));
+                Reel2.Add(new Symbol(winnerLine.Line[1], winnerLine.IsWinningLine));
+                Reel3.Add(new Symbol(winnerLine.Line[2], winnerLine.IsWinningLine));
             }
         }
 
@@ -230,6 +297,7 @@ namespace CrazyBandit.Console.ViewModels
             {
                 return _gameModel.CurrentWin;
             }
+
         }
 
 

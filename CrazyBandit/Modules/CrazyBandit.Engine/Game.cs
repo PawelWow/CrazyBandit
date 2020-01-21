@@ -117,16 +117,12 @@ namespace CrazyBandit.Engine
         /// Sprawdź czy są wygrane
         /// </summary>
         private void CheckWinnings()
-        {
-            IEnumerable<PayLine> payLines = this.Spinner.PayLines.Where(line => line.IsWinningLine);
-            foreach (PayLine line in payLines)
+        {            
+            foreach (PayLine line in this.Spinner.PayLines.Where(line => line.IsWinningLine))
             {
-                if (line.IsWinningLine)
-                {
-                    this.CurrentWin += (float)Math.Round((double)this.Winnings.Calculate(this.Bet, line.Line[0]), 2);
-                }
+                this.CurrentWin += (float)Math.Round((double)this.Winnings.Calculate(this.Bet, line.Line[0]), 2);
             }
-        }
+         }
 
         /// <summary>
         /// Ustawia stan konta gracza
