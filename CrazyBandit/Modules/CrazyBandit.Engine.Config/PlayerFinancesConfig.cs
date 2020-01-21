@@ -13,14 +13,14 @@
         /// <summary>
         /// Bilans początkowy
         /// </summary>
-        public float Balance { get; private set; }
+        public double Balance { get; private set; }
 
         /// <summary>
         /// C-tor konfiguracji użytkownika. Zawiera domyślne wartości
         /// </summary>
         /// <param name="bet">Stawka</param>
         /// <param name="balance">Początkowy bilans</param>
-        public PlayerFinancesConfig(int bet = 5, float balance = 500.00f)
+        public PlayerFinancesConfig(int bet = 5, double balance = 500.00)
         {
             this.Bet = bet;
             this.Balance = balance;

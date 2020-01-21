@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:CrazyBandit.Console"
         xmlns:con="clr-namespace:CrazyBandit.Console.Converters"
         mc:Ignorable="d"
-        Title="CrazyBandit" Height="400" Width="400" ResizeMode="NoResize">
+        Title="CrazyBandit" Height="400" Width="500" ResizeMode="NoResize">
     <Window.Resources>        
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -44,17 +44,35 @@
                 <Line Stroke="Gold" StrokeThickness="5" HorizontalAlignment="Stretch" VerticalAlignment="Center"  Width="Auto" Visibility="{Binding IsPayLine1, Converter={StaticResource BoolToVisibilityConverter}}" Grid.Row="0" Grid.ColumnSpan="3" X1="1" X2="300" />
                 <Line Stroke="Gold" StrokeThickness="5" HorizontalAlignment="Stretch" VerticalAlignment="Center"  Width="Auto" Visibility="{Binding IsPayLine2, Converter={StaticResource BoolToVisibilityConverter}}" Grid.Row="1" Grid.ColumnSpan="3" X1="1" X2="300" />
                 <Line Stroke="Gold" StrokeThickness="5" HorizontalAlignment="Stretch" VerticalAlignment="Center"  Width="Auto" Visibility="{Binding IsPayLine3, Converter={StaticResource BoolToVisibilityConverter}}" Grid.Row="2" Grid.ColumnSpan="3" X1="1" X2="300" />
+
+                <Image Source="/Resources/Images/winner.png" Visibility="{Binding IsPayLine1, Converter={StaticResource BoolToVisibilityConverter}}" Width="140" Height="70" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="0" Grid.ColumnSpan="3" />
+                <Image Source="/Resources/Images/winner.png" Visibility="{Binding IsPayLine2, Converter={StaticResource BoolToVisibilityConverter}}" Width="140" Height="70" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="1" Grid.ColumnSpan="3" />
+                <Image Source="/Resources/Images/winner.png" Visibility="{Binding IsPayLine3, Converter={StaticResource BoolToVisibilityConverter}}" Width="140" Height="70" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="2" Grid.ColumnSpan="3" />
             </Grid>
 
+            <Line Stroke="Black" StrokeThickness="1" Margin="0, 10" HorizontalAlignment="Stretch" VerticalAlignment="Center"  Width="Auto" X1="0" X2="1000" />
             
             <DockPanel HorizontalAlignment="Center" Style="{StaticResource GameStateRibbon}">
                 <TextBlock>Bet: </TextBlock>
                 <TextBlock Text="{Binding Bet, FallbackValue=0}" FontWeight="Bold" />
                 <TextBlock>Balance:</TextBlock>
-                <TextBlock Text="{Binding Balance, FallbackValue=0}" FontWeight="Bold" />
-                <TextBlock>CurrentWin: </TextBlock>
-                <TextBlock Text="{Binding CurrentWin, FallbackValue=0}" FontWeight="Bold" />
-                <Button HorizontalAlignment="Left" Width="75" Command="{Binding Spin}">Start</Button>
+                <TextBlock Text="{Binding Balance, FallbackValue=0.00, StringFormat=N2}" FontWeight="Bold" />
+                <TextBlock>Current win: </TextBlock>
+                <TextBlock Text="{Binding CurrentWin, FallbackValue=0.00, StringFormat=N2}" FontWeight="Bold" />
+                <Button HorizontalAlignment="Left" Width="100" Command="{Binding Spin}" IsEnabled="{Binding IsStartPossible }">
+                    <TextBlock>
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Text" Value="Take a chance!" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsGameRunning}" Value="True">
+                                        <Setter Property="Text" Value="Spinning..." />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>                    
+                        </TextBlock.Style>
+                    </TextBlock>
+                </Button>
             </DockPanel>
             
         </StackPanel>

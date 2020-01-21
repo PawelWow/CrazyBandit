@@ -22,7 +22,7 @@ namespace CrazyBandit.Engine.Config
         /// <summary>
         /// 
         /// </summary>
-        public Dictionary<int, float> Winnings { get; private set; }
+        public Dictionary<int, double> Winnings { get; private set; }
 
         /// <summary>
         /// Ilość linii wygrywających
@@ -87,9 +87,9 @@ namespace CrazyBandit.Engine.Config
         /// Ustawia property wygranych dla poszczególnych symboli w oparciu o dane z settingsów
         /// </summary>
         /// <param name="winnings">Wartości wygranych dla poszczególnych walców</param>
-        private void SetWinnings(int[] winnings)
+        private void SetWinnings(double[] winnings)
         {
-            this.Winnings = new Dictionary<int, float>();
+            this.Winnings = new Dictionary<int, double>();
             for (int w = 0; w < winnings.Length; w++)
             {
                 this.Winnings.Add(w, winnings[w]);

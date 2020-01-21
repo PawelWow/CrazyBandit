@@ -22,6 +22,6 @@ namespace CrazyBandit.Engine.Config
         /// <summary>
         /// Wygrana za ułożone symbole na danym walcu
         /// </summary>
-        public int[] Winnings { get; set; }        
+        public double[] Winnings { get; set; }        
     }
 }

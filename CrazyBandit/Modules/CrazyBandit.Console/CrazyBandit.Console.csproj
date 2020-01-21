@@ -15,6 +15,7 @@
     <None Remove="Resources\Images\Symbols\5.png" />
     <None Remove="Resources\Images\Symbols\6.png" />
     <None Remove="Resources\Images\Symbols\7.png" />
+    <None Remove="Resources\Images\winner.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -26,6 +27,7 @@
     <Resource Include="Resources\Images\Symbols\5.png" />
     <Resource Include="Resources\Images\Symbols\6.png" />
     <Resource Include="Resources\Images\Symbols\7.png" />
+    <Resource Include="Resources\Images\winner.png" />
   </ItemGroup>
 
   <ItemGroup>

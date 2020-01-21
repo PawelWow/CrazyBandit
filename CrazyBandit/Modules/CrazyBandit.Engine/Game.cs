@@ -29,12 +29,12 @@ namespace CrazyBandit.Engine
         /// <summary>
         /// Bilans wygranych
         /// </summary>
-        public float Balance { get; private set; }
+        public double Balance { get; private set; }
 
         /// <summary>
         /// Wygrana z danej gry
         /// </summary>
-        public float CurrentWin { get; private set; }
+        public double CurrentWin { get; private set; }
 
         /// <summary>
         /// Czy dalsza gra jest możliwa
@@ -120,7 +120,7 @@ namespace CrazyBandit.Engine
         {            
             foreach (PayLine line in this.Spinner.PayLines.Where(line => line.IsWinningLine))
             {
-                this.CurrentWin += (float)Math.Round((double)this.Winnings.Calculate(this.Bet, line.Line[0]), 2);
+                this.CurrentWin += this.Winnings.Calculate(this.Bet, line.Line[0]);
             }
          }
 

@@ -25,13 +25,13 @@ namespace CrazyBandit.Engine.UnitTests
         [TestMethod]
         public void WinningsCalculator_Calculate()
         {
-            Dictionary<int, float> winnings = new Dictionary<int, float>
+            Dictionary<int, double> winnings = new Dictionary<int, double>
             {
                 { 0, 1 },
                 { 1, 12 },
                 { 2, 3 },
-                { 3, 0.8f },
-                { 4, 0.4f },
+                { 3, 0.8 },
+                { 4, 0.4 },
                 { 5, 10 },
                 { 6, 99 },
                 { 7, 1 }
@@ -43,11 +43,11 @@ namespace CrazyBandit.Engine.UnitTests
 
             // Weryfikacja dla stawki = 1
             int bet = 1;            
-            Dictionary<int, float> actualResults = this.CalculateWinnings(bet, calculator, symbolsAll);                      
+            Dictionary<int, double> actualResults = this.CalculateWinnings(bet, calculator, symbolsAll);                      
             
             foreach(int symbol in symbolsAll)
             {
-                float expectedResult = winnings[symbol];
+                double expectedResult = winnings[symbol];
                 Assert.AreEqual(expectedResult, actualResults[symbol], $"Invalid result for {symbol}.");
             }
 
@@ -57,7 +57,7 @@ namespace CrazyBandit.Engine.UnitTests
 
             foreach (int symbol in symbolsAll)
             {
-                float expectedResult = winnings[symbol] * bet;
+                double expectedResult = winnings[symbol] * bet;
                 Assert.AreEqual(expectedResult, actualResults[symbol], $"Invalid result for {symbol}.");
             }
         }
@@ -69,9 +69,9 @@ namespace CrazyBandit.Engine.UnitTests
         /// <param name="calculator">Kalkulator licz¹cy wynik</param>
         /// <param name="symbolsAll">Symbole, dla których budujemy wyniki.</param>
         /// <returns>S³ownik z wynikami.</returns>
-        private Dictionary<int, float> CalculateWinnings(int bet, WinningsCalculator calculator, IEnumerable<int> symbolsAll)
+        private Dictionary<int, double> CalculateWinnings(int bet, WinningsCalculator calculator, IEnumerable<int> symbolsAll)
         {            
-            Dictionary<int, float> actualResults = new Dictionary<int, float>();
+            Dictionary<int, double> actualResults = new Dictionary<int, double>();
             foreach (int symbol in symbolsAll)
             {
                 actualResults.Add(symbol, calculator.Calculate(bet, symbol));

@@ -26,16 +26,98 @@ namespace CrazyBandit.Console.ViewModels
         private readonly int _visibleLinesQuantity = 3;
 
         /// <summary>
-        /// Symbole walców
+        /// Mówi czy gra jest aktualnie w toku.
+        /// </summary>
+        private bool _isGameRunning;
+
+        /// <summary>
+        /// Symbole na walcu 1
         /// </summary>
         private ObservableCollection<Symbol> _reel1;
+
+        /// <summary>
+        /// Symbole na walcu 2
+        /// </summary>
         private ObservableCollection<Symbol> _reel2;
+
+        /// <summary>
+        /// Symbole na walcu 3
+        /// </summary>
         private ObservableCollection<Symbol> _reel3;
 
+        /// <summary>
+        /// Czy linia numer 1 jest zwycięska
+        /// </summary>
         private bool _isPayLine1;
+
+        /// <summary>
+        /// Czy linia numer 2 jest zwycięska
+        /// </summary>
         private bool _isPayLine2;
+
+        /// <summary>
+        /// Czy linia numer 3 jest zwycięska
+        /// </summary>
         private bool _isPayLine3;
 
+        /// <summary>
+        /// Aktualny stan konta
+        /// </summary>
+        private double _balance;
+
+        /// <summary>
+        /// Aktualna wygrana
+        /// </summary>
+        private double _currentWin;
+
+        /// <summary>
+        /// <see cref="_isGameRunning"/>
+        /// </summary>
+        public bool IsGameRunning
+        {
+            get
+            {
+                return _isGameRunning;
+            }
+            set
+            {
+                _isGameRunning = value;
+                base.OnPropertyChange(nameof(this.IsGameRunning), nameof(this.IsStartPossible));
+            }
+        }
+
+        /// <summary>
+        /// <inheritdoc cref="_balance"/>
+        /// </summary>
+        public double Balance
+        {
+            get
+            {
+                return _balance;
+            }
+            set
+            {
+                _balance = value;
+                base.OnPropertyChange(nameof(this.Balance));
+            }
+        }
+
+        /// <summary>
+        /// <inheritdoc cref="_currentWin"/>
+        /// </summary>
+        public double CurrentWin
+        {
+            get
+            {
+                return _currentWin;
+            }
+            set
+            {
+                _currentWin = value;
+                base.OnPropertyChange(nameof(this.CurrentWin));
+
+            }
+        }
 
         /// <summary>
         /// Czy pierwsza linia zwycięzyła
@@ -85,6 +167,75 @@ namespace CrazyBandit.Console.ViewModels
             }
         }
 
+        /// <summary>
+        /// <inheritdoc cref="_reel1"/>
+        /// </summary>
+        public ObservableCollection<Symbol> Reel1
+        {
+            get
+            {
+                return _reel1;
+            }
+            set
+            {
+                _reel1 = value;
+                base.OnPropertyChange(nameof(this.Reel1));
+            }
+        }
+
+        /// <summary>
+        /// <inheritdoc cref="_reel2"/>
+        /// </summary>
+        public ObservableCollection<Symbol> Reel2
+        {
+            get
+            {
+                return _reel2;
+            }
+            set
+            {
+                _reel2 = value;
+                base.OnPropertyChange(nameof(this.Reel2));
+            }
+        }
+
+        /// <summary>
+        /// <inheritdoc cref="_reel3"/>
+        /// </summary>
+        public ObservableCollection<Symbol> Reel3
+        {
+            get
+            {
+                return _reel3;
+            }
+            set
+            {
+                _reel3 = value;
+                base.OnPropertyChange(nameof(this.Reel3));
+            }
+        }
+
+        /// <summary>
+        /// Czy możemy wystartować grę?
+        /// </summary>
+        public bool IsStartPossible
+        {
+            get
+            {
+                return !this.IsGameRunning;
+            }
+        }
+
+        /// <summary>
+        /// <inheritdoc cref="Game.Bet"/>
+        /// </summary>
+        public int Bet
+        {
+            get
+            {
+                return _gameModel.Bet;
+            }
+        }
 
         /// <summary>
         /// Komenda rozpoczęcia gry
@@ -102,7 +253,10 @@ namespace CrazyBandit.Console.ViewModels
         public GameMainWindowViewModel(Game gameModel)
         {
             Ensure.ParamNotNull(gameModel, nameof(gameModel));
-            _gameModel = gameModel;          
+            _gameModel = gameModel;
+
+            this.Balance = _gameModel.Balance;
+            this.CurrentWin = _gameModel.CurrentWin;
 
             this.Spin = new AsyncCommand(this.OnSpin);
             _reel1 = new ObservableCollection<Symbol>();
@@ -114,46 +268,6 @@ namespace CrazyBandit.Console.ViewModels
                 _reel2.Add(new Symbol(winnerLine.Line[1]));
                 _reel3.Add(new Symbol(winnerLine.Line[2]));
             }
-
-        }
-
-        public ObservableCollection<Symbol> Reel1
-        {
-            get
-            {
-                return _reel1;
-            }
-            set
-            {
-                _reel1 = value;
-                base.OnPropertyChange(nameof(this.Reel1));
-            }
-        }
-
-        public ObservableCollection<Symbol> Reel2
-        {
-            get
-            {
-                return _reel2;
-            }
-            set
-            {
-                _reel2 = value;
-                base.OnPropertyChange(nameof(this.Reel2));
-            }
-        }
-
-        public ObservableCollection<Symbol> Reel3
-        {
-            get
-            {
-                return _reel3;
-            }
-            set
-            {
-                _reel3 = value;
-                base.OnPropertyChange(nameof(this.Reel3));
-            }
         }
 
         /// <summary>
@@ -163,6 +277,8 @@ namespace CrazyBandit.Console.ViewModels
         {
             try
             {
+                this.IsGameRunning = true;
+
                 if (_gameModel.IsGamePossible == false)
                 {
                     MessageBox.Show("Game over!");
@@ -172,8 +288,29 @@ namespace CrazyBandit.Console.ViewModels
                 this.IsPayLine2 = false;
                 this.IsPayLine3 = false;
 
-                // TODO zerowaie wyników potrzebne
-                //base.OnPropertyChange(nameof(this.CurrentWin), nameof(this.Balance));
+                if (this.CurrentWin > 0.00)
+                {
+                    for (int i = 0; i < _gameModel.CurrentWin; i++)
+                    {
+                        // animacja
+                        this.CurrentWin--;
+                        this.Balance++;
+                        await Task.Delay(50);
+                    }
+
+                    // jeśli mamy jakąś resztę..
+                    const double smallestDouble = 0.01;
+                    for (double d = 0.00; d < this.CurrentWin; d += smallestDouble)
+                    {
+                        this.CurrentWin -= smallestDouble;
+                        this.Balance += smallestDouble;
+
+                        await Task.Delay(10);
+                    }
+
+                    // ostateczny stan konta
+                    this.Balance = _gameModel.Balance;
+                }
 
                 await this.DecorateTheSpin();
 
@@ -184,8 +321,35 @@ namespace CrazyBandit.Console.ViewModels
                 this.IsPayLine2 = this.Reel1[1].IsWinning;
                 this.IsPayLine3 = this.Reel1[2].IsWinning;
 
-                base.OnPropertyChange(nameof(this.CurrentWin), nameof(this.Balance));
+                if (_gameModel.CurrentWin > 0.00)    
+                {
+                    double rest = _gameModel.CurrentWin - Math.Truncate(_gameModel.CurrentWin);
+                    if (rest > 0.00)
+                    {
+                        this.CurrentWin += rest;
+                        await Task.Delay(50);
+                    }
 
+                    for (int i = 0; i <= _gameModel.CurrentWin; i++)
+                    {
+                        // animacj wyniku
+                        this.CurrentWin++;
+                        await Task.Delay(50);
+                    }
+
+                    // ostateczny wynik powinien być brany z modelu gry
+                    this.CurrentWin = _gameModel.CurrentWin;
+                }
+                else
+                {
+                    for (int i = 0; i <= _gameModel.Bet; i++)
+                    {
+                        this.Balance--;
+                        await Task.Delay(50);
+                    }
+
+                    this.Balance = _gameModel.Balance;
+                }                
             }
             catch (Exception ex)
             {
@@ -193,6 +357,10 @@ namespace CrazyBandit.Console.ViewModels
                 Trace.WriteLine(ex);
                 // To jakiś krytyczny błąd - zamykamy grę, bo coś się skopało.
                 Application.Current.Shutdown();
+            }
+            finally
+            {
+                this.IsGameRunning = false;
             }
         }
 
@@ -271,35 +439,5 @@ namespace CrazyBandit.Console.ViewModels
                 Reel3.Add(new Symbol(winnerLine.Line[2], winnerLine.IsWinningLine));
             }
         }
-
-        /// <summary>
-        /// <inheritdoc cref="Game.Bet"/>
-        /// </summary>
-        public int Bet
-        {
-            get
-            {
-                return _gameModel.Bet;
-            }
-        }
-
-        public float Balance
-        {
-            get
-            {
-                return _gameModel.Balance;
-            }
-        }
-
-        public float CurrentWin
-        {
-            get
-            {
-                return _gameModel.CurrentWin;
-            }
-
-        }
-
-
     }
 }
