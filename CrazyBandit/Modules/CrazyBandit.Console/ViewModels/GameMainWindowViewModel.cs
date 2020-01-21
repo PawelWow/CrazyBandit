@@ -71,6 +71,11 @@ namespace CrazyBandit.Console.ViewModels
         private double _currentWin;
 
         /// <summary>
+        /// Czy następuje pobieranie wypłaty?
+        /// </summary>
+        private bool _isCollecting;
+
+        /// <summary>
         /// <see cref="_isGameRunning"/>
         /// </summary>
         public bool IsGameRunning
@@ -82,7 +87,7 @@ namespace CrazyBandit.Console.ViewModels
             set
             {
                 _isGameRunning = value;
-                base.OnPropertyChange(nameof(this.IsGameRunning), nameof(this.IsStartPossible));
+                base.OnPropertyChange(nameof(this.IsGameRunning), nameof(this.IsStartPossible), nameof(this.IsPayoutAvailable));
             }
         }
 
@@ -222,7 +227,18 @@ namespace CrazyBandit.Console.ViewModels
         {
             get
             {
-                return !this.IsGameRunning;
+                return !this.IsGameRunning && !this.IsPayoutAvailable;
+            }
+        }
+
+        /// <summary>
+        /// Możemy zebrać wygraną jeśli gra nie chodzi i mamy jakąś wygrana
+        /// </summary>
+        public bool IsPayoutAvailable
+        {
+            get
+            {
+                return !this.IsGameRunning && this.CurrentWin > 0;
             }
         }
 
@@ -247,6 +263,11 @@ namespace CrazyBandit.Console.ViewModels
         }
 
         /// <summary>
+        /// Komenda zbierająca wygraną.
+        /// </summary>
+        public IAsyncCommand Collect { get; private set; }
+
+        /// <summary>
         /// C-tor ustawiający model gry
         /// </summary>
         /// <param name="gameModel"><inheritdoc cref="_gameModel"/></param>
@@ -259,6 +280,8 @@ namespace CrazyBandit.Console.ViewModels
             this.CurrentWin = _gameModel.CurrentWin;
 
             this.Spin = new AsyncCommand(this.OnSpin);
+            this.Collect = new AsyncCommand(this.OnCollect);
+
             _reel1 = new ObservableCollection<Symbol>();
             _reel2 = new ObservableCollection<Symbol>();
             _reel3 = new ObservableCollection<Symbol>();
@@ -286,31 +309,7 @@ namespace CrazyBandit.Console.ViewModels
 
                 this.IsPayLine1 = false;
                 this.IsPayLine2 = false;
-                this.IsPayLine3 = false;
-
-                if (this.CurrentWin > 0.00)
-                {
-                    for (int i = 0; i < _gameModel.CurrentWin; i++)
-                    {
-                        // animacja
-                        this.CurrentWin--;
-                        this.Balance++;
-                        await Task.Delay(50);
-                    }
-
-                    // jeśli mamy jakąś resztę..
-                    const double smallestDouble = 0.01;
-                    for (double d = 0.00; d < this.CurrentWin; d += smallestDouble)
-                    {
-                        this.CurrentWin -= smallestDouble;
-                        this.Balance += smallestDouble;
-
-                        await Task.Delay(10);
-                    }
-
-                    // ostateczny stan konta
-                    this.Balance = _gameModel.Balance;
-                }
+                this.IsPayLine3 = false;                
 
                 await this.DecorateTheSpin();
 
@@ -353,15 +352,72 @@ namespace CrazyBandit.Console.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Spin failed. {ex.Message}");
-                Trace.WriteLine(ex);
-                // To jakiś krytyczny błąd - zamykamy grę, bo coś się skopało.
-                Application.Current.Shutdown();
+                this.HandleCriticalError(ex);
             }
             finally
             {
                 this.IsGameRunning = false;
             }
+        }
+
+        /// <summary>
+        /// Obsługa komendy <see cref="Collect"/>
+        /// </summary>
+        private async Task OnCollect()
+        {
+            try
+            {
+                if (_isCollecting)
+                {
+                    return;
+                }
+
+                _isCollecting = true;
+
+                for (int i = 0; i < _gameModel.CurrentWin; i++)
+                {
+                    // animacja
+                    this.CurrentWin--;
+                    this.Balance++;
+                    await Task.Delay(50);
+                }
+
+                // jeśli mamy jakąś resztę..
+                const double smallestDouble = 0.01;
+                for (double d = 0.00; d < this.CurrentWin; d += smallestDouble)
+                {
+                    this.CurrentWin -= smallestDouble;
+                    this.Balance += smallestDouble;
+
+                    await Task.Delay(50);
+                }
+
+                // ostateczny stan konta
+                this.Balance = _gameModel.Balance;
+
+                this.OnPropertyChange(nameof(this.IsPayoutAvailable), nameof(this.IsStartPossible));
+            }
+            catch (Exception ex)
+            {
+                this.HandleCriticalError(ex);
+            }
+            finally
+            {
+                _isCollecting = false;
+            }
+
+        }
+
+        /// <summary>
+        /// Obsługa bardzo poważnego błędu. Wyświetla bład i zamyka aplikację
+        /// </summary>
+        /// <param name="ex">Exception</param>
+        private void HandleCriticalError(Exception ex)
+        {
+            MessageBox.Show($"Critical failure. {ex.Message}");
+            Trace.WriteLine(ex);
+            // To jakiś krytyczny błąd - zamykamy grę, bo coś się skopało.
+            Application.Current.Shutdown();
         }
 
         /// <summary>
