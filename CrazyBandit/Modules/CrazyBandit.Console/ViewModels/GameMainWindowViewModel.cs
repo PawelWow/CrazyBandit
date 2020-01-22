@@ -120,7 +120,6 @@ namespace CrazyBandit.Console.ViewModels
             {
                 _currentWin = value;
                 base.OnPropertyChange(nameof(this.CurrentWin));
-
             }
         }
 
@@ -282,6 +281,9 @@ namespace CrazyBandit.Console.ViewModels
             this.Spin = new AsyncCommand(this.OnSpin);
             this.Collect = new AsyncCommand(this.OnCollect);
 
+            Trace.WriteLine($"Game started with RNO: {_gameModel.Spinner.Rno}");
+
+            // Ustawienia początkowe walców
             _reel1 = new ObservableCollection<Symbol>();
             _reel2 = new ObservableCollection<Symbol>();
             _reel3 = new ObservableCollection<Symbol>();
@@ -300,55 +302,18 @@ namespace CrazyBandit.Console.ViewModels
         {
             try
             {
-                this.IsGameRunning = true;
-
+                this.ClearWinnerStatus();            
                 if (_gameModel.IsGamePossible == false)
                 {
-                    MessageBox.Show("Game over!");
+                    MessageBox.Show($"Game over! Your balance is: {_gameModel.Balance} and the bet is {_gameModel.Bet}");
+                    Trace.WriteLine($"User ends game with RNO: {_gameModel.Spinner.Rno};");
+                    return;
                 }
 
-                this.IsPayLine1 = false;
-                this.IsPayLine2 = false;
-                this.IsPayLine3 = false;                
-
-                await this.DecorateTheSpin();
-
+                this.IsGameRunning = true;
                 _gameModel.Start();
-                this.SetReels(_gameModel.Spinner.PayLines);
-
-                this.IsPayLine1 = this.Reel1[0].IsWinning;
-                this.IsPayLine2 = this.Reel1[1].IsWinning;
-                this.IsPayLine3 = this.Reel1[2].IsWinning;
-
-                if (_gameModel.CurrentWin > 0.00)    
-                {
-                    double rest = _gameModel.CurrentWin - Math.Truncate(_gameModel.CurrentWin);
-                    if (rest > 0.00)
-                    {
-                        this.CurrentWin += rest;
-                        await Task.Delay(50);
-                    }
-
-                    for (int i = 0; i <= _gameModel.CurrentWin; i++)
-                    {
-                        // animacj wyniku
-                        this.CurrentWin++;
-                        await Task.Delay(50);
-                    }
-
-                    // ostateczny wynik powinien być brany z modelu gry
-                    this.CurrentWin = _gameModel.CurrentWin;
-                }
-                else
-                {
-                    for (int i = 0; i <= _gameModel.Bet; i++)
-                    {
-                        this.Balance--;
-                        await Task.Delay(50);
-                    }
-
-                    this.Balance = _gameModel.Balance;
-                }                
+                await this.DecorateTheSpin();
+                await this.SumUpSpinResult();
             }
             catch (Exception ex)
             {
@@ -358,6 +323,59 @@ namespace CrazyBandit.Console.ViewModels
             {
                 this.IsGameRunning = false;
             }
+        }
+
+        /// <summary>
+        /// Czyści status zwycięcy - usuwa wszystko, co mówiło, że gracz wygrał.
+        /// </summary>
+        private void ClearWinnerStatus()
+        {
+            this.IsPayLine1 = false;
+            this.IsPayLine2 = false;
+            this.IsPayLine3 = false;
+        }
+
+        /// <summary>
+        /// Podsumowanie spina: czy wygrał i ile wygrał.
+        /// </summary>
+        private async Task SumUpSpinResult()
+        {
+            // Mówimy czy linia wygrała
+            this.IsPayLine1 = this.Reel1[0].IsWinning;
+            this.IsPayLine2 = this.Reel1[1].IsWinning;
+            this.IsPayLine3 = this.Reel1[2].IsWinning;
+
+            if (_gameModel.CurrentWin < 1)
+            {
+                // nic nie wygrano
+                for (int i = 0; i <= _gameModel.Bet; i++)
+                {
+                    this.Balance--;
+                    await Task.Delay(50);
+                }
+
+                // ostatecznie wynik bierzemy z modelu
+                this.Balance = _gameModel.Balance;
+
+                return;
+            }
+
+            double rest = _gameModel.CurrentWin - Math.Truncate(_gameModel.CurrentWin);
+            if (rest > 0.00)
+            {
+                this.CurrentWin += rest;
+                await Task.Delay(50);
+            }
+
+            for (int i = 0; i <= _gameModel.CurrentWin; i++)
+            {
+                // animacj wyniku
+                this.CurrentWin++;
+                await Task.Delay(50);
+            }
+
+            // ostateczny wynik powinien być brany z modelu gry
+            this.CurrentWin = _gameModel.CurrentWin;
         }
 
         /// <summary>
@@ -425,64 +443,70 @@ namespace CrazyBandit.Console.ViewModels
         /// </summary>
         private async Task DecorateTheSpin()
         {
+            PayLine[] payLines = this.GetVisiblePayLines();
 
+            int reel1 = 0, reel2 = 1, reel3 = 2;
             List<Task> tasks = new List<Task>
             {
-                Task.Factory.StartNew( () => { this.AnimateReel(0, this.Reel1); }),
-                Task.Factory.StartNew( () => { this.AnimateReel(1, this.Reel2); }),
-                Task.Factory.StartNew( () => { this.AnimateReel(2, this.Reel3); })
+                Task.Factory.StartNew( () => { this.AnimateReel(reel1, payLines, this.Reel1); }),
+                Task.Factory.StartNew( () => { this.AnimateReel(reel2, payLines, this.Reel2); }),
+                Task.Factory.StartNew( () => { this.AnimateReel(reel3, payLines, this.Reel3); })
             };
 
             await Task.WhenAll(tasks);
-            
-            
+
+            base.OnPropertyChange(nameof(this.Reel1), nameof(this.Reel2), nameof(this.Reel3));
         }
 
         /// <summary>
-        /// 
+        /// Przeprowadzamy animację zakręcenia bębnem - najpierw bierzemy listę unikalnych symboli dla danego walca i przewijamy je po kolei.
+        /// Przy ostatnim przesunięciu walca bierzemy symbol z modelu gry (czyli ten, który został "wylosowany").
         /// </summary>
         /// <param name="reelNumber">Numer walca w modelu gry</param>
+        /// <param name="payLines"></param>
         /// <param name="reelSymbols">Walec na widoku</param>        
-        private void AnimateReel(int reelNumber, ObservableCollection<Symbol> reelSymbols)
+        private void AnimateReel(int reelNumber, PayLine[] payLines, ObservableCollection<Symbol> reelSymbols)
         {
 
-            int[] reelSymbolsUnique = _gameModel.Reels[reelNumber].Symbols.Distinct().ToArray();   
-            
+            int[] reelSymbolsUnique = _gameModel.Reels[reelNumber].Symbols.Distinct().ToArray();                       
+
             // enumerujemy po liczbie spinów, nie po indexie czyli od 1 do liczby spinów włącznie
             for (int spin = 1; spin <= _gameModel.Reels[reelNumber].Spin; spin++)
             {
-                int startIndex = Array.FindIndex(reelSymbolsUnique, s => s == reelSymbols[0].Value);
-                for (int line = 0; line < reelSymbols.Count; line++)
+                int[] availableSymbols = this.ChooseReelSymbols(reelSymbolsUnique, reelSymbols.Count, reelSymbols[0].Value);
+                for (int lineNumber = 0; lineNumber < _visibleLinesQuantity; lineNumber++)
                 {
-                    startIndex++;
-                    if (startIndex >= reelSymbolsUnique.Length)
+                    if (spin < _gameModel.Reels[reelNumber].Spin)
                     {
-                        startIndex = 0;
+                        reelSymbols[lineNumber] = new Symbol(availableSymbols[lineNumber]);
                     }
-
-                    int symbol = reelSymbolsUnique[startIndex];
-                    reelSymbols[line] = new Symbol(symbol);
-                }
+                    else
+                    {
+                        reelSymbols[lineNumber] = new Symbol(payLines[lineNumber].Line[reelNumber], payLines[lineNumber].IsWinningLine);                        
+                    }                    
+                }                
 
                 Task.Delay(100).GetAwaiter().GetResult();
             }
         }
 
+        
         /// <summary>
-        /// Ustawia walce
+        /// Zbiera zdefiniowaną liczbę symboli dla danego walca 
         /// </summary>
-        /// <param name="payLines"></param>
-        private void SetReels(IEnumerable<PayLine> payLines)
+        /// <returns></returns>
+        private PayLine[] GetVisiblePayLines()
         {
-            this.Reel1.Clear();
-            this.Reel2.Clear();
-            this.Reel3.Clear();
+            int payLinesCount = _gameModel.Spinner.PayLines.Count();
+            int additionalPayLines = payLinesCount - _visibleLinesQuantity;
 
-            int additionalPayLines = payLines.Count() - _visibleLinesQuantity;
+            // Ile linii przerobiliśmy?
+            int linesComplete = 0;
 
-            foreach (PayLine winnerLine in payLines)
+            PayLine[] visiblePayLines = new PayLine[_visibleLinesQuantity];
+            foreach (PayLine payLine in _gameModel.Spinner.PayLines)
             {
-                if (winnerLine.IsWinningLine == false && additionalPayLines > 0)
+                if (payLine.IsWinningLine == false && additionalPayLines > 0)
                 {
                     // Jeśli ta linia nie daje nam wygranej to jej nie wyświetlamy, może następna będzie miała
                     // Robimy tak tylko jeśli mamy więcej wygranych linii niż wyświetlamy.
@@ -490,10 +514,38 @@ namespace CrazyBandit.Console.ViewModels
                     continue;
                 }
 
-                Reel1.Add(new Symbol(winnerLine.Line[0], winnerLine.IsWinningLine));
-                Reel2.Add(new Symbol(winnerLine.Line[1], winnerLine.IsWinningLine));
-                Reel3.Add(new Symbol(winnerLine.Line[2], winnerLine.IsWinningLine));
+                visiblePayLines[linesComplete] = payLine;
+                linesComplete++;
             }
+
+            return visiblePayLines;
+        }
+
+        /// <summary>
+        /// Tworzy symbole dla każdej linii wygrywającej konkretnego walca na podstawie unikalnych symboli na walcu.
+        /// </summary>
+        /// <param name="reelSymbols">Symbole na walcu</param>
+        /// <param name="linesCount">Ilość linii widocznych na ekranie</param>
+        /// <param name="startSymbol">Symbol, od którego startujemy.</param>
+        /// <returns></returns>
+        private int[] ChooseReelSymbols(int[] reelSymbols, int linesCount, int startSymbol)
+        {
+            int[] symbols = new int[linesCount];          
+
+            int startIndex = Array.FindIndex(reelSymbols, s => s == startSymbol);
+
+            for (int line = 0; line < linesCount; line++)
+            {
+                startIndex++;
+                if (startIndex >= reelSymbols.Length)
+                {
+                    startIndex = 0;
+                }
+
+                symbols[line] = reelSymbols[startIndex];
+            }
+
+            return symbols;
         }
     }
 }
